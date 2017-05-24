@@ -26,6 +26,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ElmoTeacherDecoder.py" />
+    <Compile Include="winrate.py" />
     <Compile Include="test.py">
       <SubType>Code</SubType>
     </Compile>
