@@ -5,14 +5,34 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ElmoTeacherDecoder", "ElmoTeacherDecoder.pyproj", "{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hcp_decoder", "hcp_decoder\hcp_decoder.vcxproj", "{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}.Release|x64.ActiveCfg = Release|Any CPU
+		{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}.Release|x86.ActiveCfg = Release|Any CPU
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Debug|x64.ActiveCfg = Debug|x64
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Debug|x64.Build.0 = Debug|x64
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Debug|x86.ActiveCfg = Debug|Win32
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Debug|x86.Build.0 = Debug|Win32
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Release|Any CPU.ActiveCfg = Release|Win32
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Release|x64.ActiveCfg = Release|x64
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Release|x64.Build.0 = Release|x64
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Release|x86.ActiveCfg = Release|Win32
+		{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
