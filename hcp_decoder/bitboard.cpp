@@ -106,7 +106,7 @@ const Bitboard SetMaskBB[SquareNum] = {
     Bitboard(                0, UINT64_C(1) << 17)   // 80, SQ99
 };
 
-// 吁E�Eスのrookが利きを調べる忁E��があるマスの数
+// 各マスのrookが利きを調べる必要があるマスの数
 const int RookBlockBits[SquareNum] = {
     14, 13, 13, 13, 13, 13, 13, 13, 14,
     13, 12, 12, 12, 12, 12, 12, 12, 13,
@@ -119,7 +119,7 @@ const int RookBlockBits[SquareNum] = {
     14, 13, 13, 13, 13, 13, 13, 13, 14
 };
 
-// 吁E�Eスのbishopが利きを調べる忁E��があるマスの数
+// 各マスのbishopが利きを調べる必要があるマスの数
 const int BishopBlockBits[SquareNum] = {
     7,  6,  6,  6,  6,  6,  6,  6,  7,
     6,  6,  6,  6,  6,  6,  6,  6,  6,
@@ -132,8 +132,12 @@ const int BishopBlockBits[SquareNum] = {
     7,  6,  6,  6,  6,  6,  6,  6,  7
 };
 
-// Magic Bitboard で利きを求める際のシフト釁E// RookShiftBits[17], RookShiftBits[53] はマジチE��ナンバ�Eが見つからなかったため、E// シフト量を 1 つ減らす、EチE�EブルサイズめE2 倍にする、E
-// こ�E方法�E issei_y さんに相諁E��たところ、教えて頂いた方法、E// PEXT Bitboardを使用する際�Eシフト量を減らす忁E��が無ぁE��Econst int RookShiftBits[SquareNum] = {
+// Magic Bitboard で利きを求める際のシフト量
+// RookShiftBits[17], RookShiftBits[53] はマジックナンバーが見つからなかったため、
+// シフト量を 1 つ減らす。(テーブルサイズを 2 倍にする。)
+// この方法は issei_y さんに相談したところ、教えて頂いた方法。
+// PEXT Bitboardを使用する際はシフト量を減らす必要が無い。
+const int RookShiftBits[SquareNum] = {
     50, 51, 51, 51, 51, 51, 51, 51, 50,
 #if defined HAVE_BMI2
     51, 52, 52, 52, 52, 52, 52, 52, 51,
@@ -153,7 +157,8 @@ const int BishopBlockBits[SquareNum] = {
     50, 51, 51, 51, 51, 51, 51, 51, 50
 };
 
-// Magic Bitboard で利きを求める際のシフト釁Econst int BishopShiftBits[SquareNum] = {
+// Magic Bitboard で利きを求める際のシフト量
+const int BishopShiftBits[SquareNum] = {
     57, 58, 58, 58, 58, 58, 58, 58, 57,
     58, 58, 58, 58, 58, 58, 58, 58, 58,
     58, 58, 56, 56, 56, 56, 56, 58, 58,
@@ -241,7 +246,9 @@ const Bitboard InFrontMask[ColorNum][RankNum] = {
     { InFrontOfRank1White, InFrontOfRank2White, InFrontOfRank3White, InFrontOfRank4White, InFrontOfRank5White, InFrontOfRank6White, InFrontOfRank7White, InFrontOfRank8White, InFrontOfRank9White }
 };
 
-// これら�E一度値を設定したら二度と変更しなぁE��E// 本当�E const 化したい、E#if defined HAVE_BMI2
+// これらは一度値を設定したら二度と変更しない。
+// 本当は const 化したい。
+#if defined HAVE_BMI2
 Bitboard RookAttack[495616];
 #else
 Bitboard RookAttack[512000];

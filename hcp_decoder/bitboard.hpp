@@ -56,7 +56,8 @@ public:
 #endif
     }
     bool isAny() const { return static_cast<bool>(*this); }
-    // これはコードが見難くなるけど仕方なぁE��E    bool andIsAny(const Bitboard& bb) const {
+    // これはコードが見難くなるけど仕方ない。
+    bool andIsAny(const Bitboard& bb) const {
 #ifdef HAVE_SSE4
         return !(_mm_testz_si128(this->m_, bb.m_));
 #else
@@ -130,7 +131,8 @@ public:
 #endif
     }
     bool operator != (const Bitboard& rhs) const { return !(*this == rhs); }
-    // これはコードが見難くなるけど仕方なぁE��E    Bitboard andEqualNot(const Bitboard& bb) {
+    // これはコードが見難くなるけど仕方ない。
+    Bitboard andEqualNot(const Bitboard& bb) {
 #if defined (HAVE_SSE2) || defined (HAVE_SSE4)
         _mm_store_si128(&this->m_, _mm_andnot_si128(bb.m_, this->m_));
 #else
@@ -138,7 +140,8 @@ public:
 #endif
         return *this;
     }
-    // これはコードが見難くなるけど仕方なぁE��E    Bitboard notThisAnd(const Bitboard& bb) const {
+    // これはコードが見難くなるけど仕方ない。
+    Bitboard notThisAnd(const Bitboard& bb) const {
 #if defined (HAVE_SSE2) || defined (HAVE_SSE4)
         Bitboard temp;
         _mm_store_si128(&temp.m_, _mm_andnot_si128(this->m_, bb.m_));
@@ -155,34 +158,48 @@ public:
     void clearBit(const Square sq) { andEqualNot(SetMaskBB[sq]); }
     void xorBit(const Square sq) { (*this) ^= SetMaskBB[sq]; }
     void xorBit(const Square sq1, const Square sq2) { (*this) ^= (SetMaskBB[sq1] | SetMaskBB[sq2]); }
-    // Bitboard の right 側だけ�E要素を調べて、最初に 1 であるマスの index を返す、E    // そ�EマスめE0 にする、E    // Bitboard の right 側ぁE0 でなぁE��とを前提にしてぁE��、E    FORCE_INLINE Square firstOneRightFromSQ11() {
+    // Bitboard の right 側だけの要素を調べて、最初に 1 であるマスの index を返す。
+    // そのマスを 0 にする。
+    // Bitboard の right 側が 0 でないことを前提にしている。
+    FORCE_INLINE Square firstOneRightFromSQ11() {
         const Square sq = static_cast<Square>(firstOneFromLSB(this->p(0)));
-        // LSB 側の最初�E 1 の bit めE0 にする
+        // LSB 側の最初の 1 の bit を 0 にする
         this->p_[0] &= this->p(0) - 1;
         return sq;
     }
-    // Bitboard の left 側だけ�E要素を調べて、最初に 1 であるマスの index を返す、E    // そ�EマスめE0 にする、E    // Bitboard の left 側ぁE0 でなぁE��とを前提にしてぁE��、E    FORCE_INLINE Square firstOneLeftFromSQ81() {
+    // Bitboard の left 側だけの要素を調べて、最初に 1 であるマスの index を返す。
+    // そのマスを 0 にする。
+    // Bitboard の left 側が 0 でないことを前提にしている。
+    FORCE_INLINE Square firstOneLeftFromSQ81() {
         const Square sq = static_cast<Square>(firstOneFromLSB(this->p(1)) + 63);
-        // LSB 側の最初�E 1 の bit めE0 にする
+        // LSB 側の最初の 1 の bit を 0 にする
         this->p_[1] &= this->p(1) - 1;
         return sq;
     }
-    // Bitboard めESQ11 から SQ99 まで調べて、最初に 1 であるマスの index を返す、E    // そ�EマスめE0 にする、E    // Bitboard ぁEallZeroBB() でなぁE��とを前提にしてぁE��、E    // VC++ の _BitScanForward() は入力が 0 のときに 0 を返す仕様なので、E    // 最初に 0 でなぁE��判定する�Eは少し損、E    FORCE_INLINE Square firstOneFromSQ11() {
+    // Bitboard を SQ11 から SQ99 まで調べて、最初に 1 であるマスの index を返す。
+    // そのマスを 0 にする。
+    // Bitboard が allZeroBB() でないことを前提にしている。
+    // VC++ の _BitScanForward() は入力が 0 のときに 0 を返す仕様なので、
+    // 最初に 0 でないか判定するのは少し損。
+    FORCE_INLINE Square firstOneFromSQ11() {
         if (this->p(0))
             return firstOneRightFromSQ11();
         return firstOneLeftFromSQ81();
     }
-    // 返す位置めE0 にしなぁE��ージョン、E    FORCE_INLINE Square constFirstOneRightFromSQ11() const { return static_cast<Square>(firstOneFromLSB(this->p(0))); }
+    // 返す位置を 0 にしないバージョン。
+    FORCE_INLINE Square constFirstOneRightFromSQ11() const { return static_cast<Square>(firstOneFromLSB(this->p(0))); }
     FORCE_INLINE Square constFirstOneLeftFromSQ81() const { return static_cast<Square>(firstOneFromLSB(this->p(1)) + 63); }
     FORCE_INLINE Square constFirstOneFromSQ11() const {
         if (this->p(0))
             return constFirstOneRightFromSQ11();
         return constFirstOneLeftFromSQ81();
     }
-    // Bitboard の 1 の bit を数える、E    // Crossover は、merge() すると 1 である bit が重なる可能性があるなめEtrue
+    // Bitboard の 1 の bit を数える。
+    // Crossover は、merge() すると 1 である bit が重なる可能性があるなら true
     template <bool Crossover = true>
     int popCount() const { return (Crossover ? count1s(p(0)) + count1s(p(1)) : count1s(merge())); }
-    // bit ぁE1 つだけ立ってぁE��かどぁE��を判定する、E    // Crossover は、merge() すると 1 である bit が重なる可能性があるなめEtrue
+    // bit が 1 つだけ立っているかどうかを判定する。
+    // Crossover は、merge() すると 1 である bit が重なる可能性があるなら true
     template <bool Crossover = true>
     bool isOneBit() const {
 #if defined (HAVE_SSE42)
@@ -218,7 +235,8 @@ public:
         std::cout << std::endl;
     }
 
-    // 持E��した位置ぁEBitboard のどちら�E u64 変数の要素ぁE    static int part(const Square sq) { return static_cast<int>(SQ79 < sq); }
+    // 指定した位置が Bitboard のどちらの u64 変数の要素か
+    static int part(const Square sq) { return static_cast<int>(SQ79 < sq); }
 
 private:
 #if defined (HAVE_SSE2) || defined (HAVE_SSE4)
@@ -227,12 +245,14 @@ private:
         __m128i m_;
     };
 #else
-    u64 p_[2];  // p_[0] : 先手から見て、E一から7九までを縦に並べたbit. 63bit使用. right と呼ぶ、E                // p_[1] : 先手から見て、E一から1九までを縦に並べたbit. 18bit使用. left  と呼ぶ、E#endif
+    u64 p_[2];  // p_[0] : 先手から見て、1一から7九までを縦に並べたbit. 63bit使用. right と呼ぶ。
+                // p_[1] : 先手から見て、8一から1九までを縦に並べたbit. 18bit使用. left  と呼ぶ。
+#endif
 };
 
 inline Bitboard setMaskBB(const Square sq) { return SetMaskBB[sq]; }
 
-// 実際に使用する部刁E�E全て bit が立ってぁE�� Bitboard
+// 実際に使用する部分の全て bit が立っている Bitboard
 inline Bitboard allOneBB() { return Bitboard(UINT64_C(0x7fffffffffffffff), UINT64_C(0x000000000003ffff)); }
 inline Bitboard allZeroBB() { return Bitboard(0, 0); }
 
@@ -246,7 +266,9 @@ extern const u64 RookMagic[SquareNum];
 extern const u64 BishopMagic[SquareNum];
 #endif
 
-// 持E��した位置の属すめEfile の bit めEshift し、E// index を求める為に使用する、Econst int Slide[SquareNum] = {
+// 指定した位置の属する file の bit を shift し、
+// index を求める為に使用する。
+const int Slide[SquareNum] = {
     1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
     10, 10, 10, 10, 10, 10, 10, 10, 10,
     19, 19, 19, 19, 19, 19, 19, 19, 19,
@@ -310,12 +332,14 @@ template <Rank R> inline Bitboard rankMask() {
             : /*R == Rank9 ?*/ Rank9Mask);
 }
 
-// 直接チE�Eブル引きすべきだと思う、Einline Bitboard squareFileMask(const Square sq) {
+// 直接テーブル引きすべきだと思う。
+inline Bitboard squareFileMask(const Square sq) {
     const File f = makeFile(sq);
     return fileMask(f);
 }
 
-// 直接チE�Eブル引きすべきだと思う、Einline Bitboard squareRankMask(const Square sq) {
+// 直接テーブル引きすべきだと思う。
+inline Bitboard squareRankMask(const Square sq) {
     const Rank r = makeRank(sq);
     return rankMask(r);
 }
@@ -364,17 +388,20 @@ template <Color C, Rank R> inline Bitboard inFrontMask() {
                : /*R == Rank9 ?*/ InFrontOfRank9White));
 }
 
-// メモリ節紁E�E為、E次允E�E列にして無駁E��無ぁE��ぁE��してぁE��、E#if defined HAVE_BMI2
+// メモリ節約の為、1次元配列にして無駄が無いようにしている。
+#if defined HAVE_BMI2
 extern Bitboard RookAttack[495616];
 #else
 extern Bitboard RookAttack[512000];
 #endif
 extern int RookAttackIndex[SquareNum];
-// メモリ節紁E�E為、E次允E�E列にして無駁E��無ぁE��ぁE��してぁE��、Eextern Bitboard BishopAttack[20224];
+// メモリ節約の為、1次元配列にして無駄が無いようにしている。
+extern Bitboard BishopAttack[20224];
 extern int BishopAttackIndex[SquareNum];
 extern Bitboard RookBlockMask[SquareNum];
 extern Bitboard BishopBlockMask[SquareNum];
-// メモリ節紁E��せず、無駁E��メモリを持ってぁE��、Eextern Bitboard LanceAttack[ColorNum][SquareNum][128];
+// メモリ節約をせず、無駄なメモリを持っている。
+extern Bitboard LanceAttack[ColorNum][SquareNum][128];
 
 extern Bitboard KingAttack[SquareNum];
 extern Bitboard GoldAttack[ColorNum][SquareNum];
@@ -411,7 +438,7 @@ inline Bitboard bishopAttack(const Square sq, const Bitboard& occupied) {
 }
 #else
 // magic bitboard.
-// magic number を使って block の模様から利き�EチE�EブルへのインチE��クスを算�E
+// magic number を使って block の模様から利きのテーブルへのインデックスを算出
 inline u64 occupiedToIndex(const Bitboard& block, const u64 magic, const int shiftBits) {
     return (block.merge() * magic) >> shiftBits;
 }
@@ -425,12 +452,14 @@ inline Bitboard bishopAttack(const Square sq, const Bitboard& occupied) {
     return BishopAttack[BishopAttackIndex[sq] + occupiedToIndex(block, BishopMagic[sq], BishopShiftBits[sq])];
 }
 #endif
-// todo: 香車�E筋がどこにあるか�Eに刁E��ってぁE��ば、Bitboard の牁E��の変数だけを調べれ�E良くなる、Einline Bitboard lanceAttack(const Color c, const Square sq, const Bitboard& occupied) {
+// todo: 香車の筋がどこにあるか先に分かっていれば、Bitboard の片方の変数だけを調べれば良くなる。
+inline Bitboard lanceAttack(const Color c, const Square sq, const Bitboard& occupied) {
     const int part = Bitboard::part(sq);
     const int index = (occupied.p(part) >> Slide[sq]) & 127;
     return LanceAttack[c][sq][index];
 }
-// 飛車�E縦だけ�E利き。香車�E利きを使ぁE��index を�E通化することで高速化してぁE��、Einline Bitboard rookAttackFile(const Square sq, const Bitboard& occupied) {
+// 飛車の縦だけの利き。香車の利きを使い、index を共通化することで高速化している。
+inline Bitboard rookAttackFile(const Square sq, const Bitboard& occupied) {
     const int part = Bitboard::part(sq);
     const int index = (occupied.p(part) >> Slide[sq]) & 127;
     return LanceAttack[Black][sq][index] | LanceAttack[White][sq][index];
@@ -440,13 +469,17 @@ inline Bitboard silverAttack(const Color c, const Square sq) { return SilverAtta
 inline Bitboard knightAttack(const Color c, const Square sq) { return KnightAttack[c][sq]; }
 inline Bitboard pawnAttack(const Color c, const Square sq) { return PawnAttack[c][sq]; }
 
-// Bitboard で直接利きを返す関数、E// 1段目には歩は存在しなぁE�Eで、Ebit シフトで別の筋に行くことはなぁE��E// ただし、from に歩以外�E駒�E Bitboard を�Eれると、別の筋�Eビットが立ってしまぁE��とがある�Eで、E// 別の筋�Eビットが立たなぁE��、立っても問題なぁE��を確認して使用すること、Etemplate <Color US> inline Bitboard pawnAttack(const Bitboard& from) { return (US == Black ? (from >> 1) : (from << 1)); }
+// Bitboard で直接利きを返す関数。
+// 1段目には歩は存在しないので、1bit シフトで別の筋に行くことはない。
+// ただし、from に歩以外の駒の Bitboard を入れると、別の筋のビットが立ってしまうことがあるので、
+// 別の筋のビットが立たないか、立っても問題ないかを確認して使用すること。
+template <Color US> inline Bitboard pawnAttack(const Bitboard& from) { return (US == Black ? (from >> 1) : (from << 1)); }
 inline Bitboard kingAttack(const Square sq) { return KingAttack[sq]; }
 inline Bitboard dragonAttack(const Square sq, const Bitboard& occupied) { return rookAttack(sq, occupied) | kingAttack(sq); }
 inline Bitboard horseAttack(const Square sq, const Bitboard& occupied) { return bishopAttack(sq, occupied) | kingAttack(sq); }
 inline Bitboard queenAttack(const Square sq, const Bitboard& occupied) { return rookAttack(sq, occupied) | bishopAttack(sq, occupied); }
 
-// sq1, sq2 の閁Esq1, sq2 は含まなぁEのビットが立っぁEBitboard
+// sq1, sq2 の間(sq1, sq2 は含まない)のビットが立った Bitboard
 inline Bitboard betweenBB(const Square sq1, const Square sq2) { return BetweenBB[sq1][sq2]; }
 inline Bitboard rookAttackToEdge(const Square sq) { return RookAttackToEdge[sq]; }
 inline Bitboard bishopAttackToEdge(const Square sq) { return BishopAttackToEdge[sq]; }
@@ -459,13 +492,20 @@ inline Bitboard knightCheckTable(const Color c, const Square sq) { return Knight
 inline Bitboard lanceCheckTable(const Color c, const Square sq) { return LanceCheckTable[c][sq]; }
 
 inline Bitboard neighbor5x5Table(const Square sq) { return Neighbor5x5Table[sq]; }
-// todo: チE�Eブル引きを検訁Einline Bitboard rookStepAttacks(const Square sq) { return goldAttack(Black, sq) & goldAttack(White, sq); }
-// todo: チE�Eブル引きを検訁Einline Bitboard bishopStepAttacks(const Square sq) { return silverAttack(Black, sq) & silverAttack(White, sq); }
-// 前方3方向�E位置のBitboard
+// todo: テーブル引きを検討
+inline Bitboard rookStepAttacks(const Square sq) { return goldAttack(Black, sq) & goldAttack(White, sq); }
+// todo: テーブル引きを検討
+inline Bitboard bishopStepAttacks(const Square sq) { return silverAttack(Black, sq) & silverAttack(White, sq); }
+// 前方3方向の位置のBitboard
 inline Bitboard goldAndSilverAttacks(const Color c, const Square sq) { return goldAttack(c, sq) & silverAttack(c, sq); }
 
-// Bitboard の全ての bit に対して同様�E処琁E��行う際に使用するマクロ
-// xxx に処琁E��書く、E// xxx には template 引数めE2 つ以上持つクラスめE��数は () でくくらなぁE��使えなぁE��E// これはマクロの制紁E��E// 同じ処琁E�Eコードが 2 箁E��で生�Eされるため、コードサイズが�Eれ上がる、E// そ�E為、あまり多用すべきでなぁE��も知れなぁE��E#define FOREACH_BB(bb, sq, xxx)                 \
+// Bitboard の全ての bit に対して同様の処理を行う際に使用するマクロ
+// xxx に処理を書く。
+// xxx には template 引数を 2 つ以上持つクラスや関数は () でくくらないと使えない。
+// これはマクロの制約。
+// 同じ処理のコードが 2 箇所で生成されるため、コードサイズが膨れ上がる。
+// その為、あまり多用すべきでないかも知れない。
+#define FOREACH_BB(bb, sq, xxx)                 \
     do {                                        \
         while (bb.p(0)) {                       \
             sq = bb.firstOneRightFromSQ11();    \
