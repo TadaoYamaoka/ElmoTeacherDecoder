@@ -19,35 +19,17 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "common.hpp"
-#include "piece.hpp"
-#include "hand.hpp"
+#ifndef APERY_INIT_HPP
+#define APERY_INIT_HPP
 
-const int Hand::HandPieceShiftBits[HandPieceNum] = {
-    HPawnShiftBits,
-    HLanceShiftBits,
-    HKnightShiftBits,
-    HSilverShiftBits,
-    HGoldShiftBits,
-    HBishopShiftBits,
-    HRookShiftBits
-};
-const u32 Hand::HandPieceMask[HandPieceNum] = {
-    HPawnMask,
-    HLanceMask,
-    HKnightMask,
-    HSilverMask,
-    HGoldMask,
-    HBishopMask,
-    HRookMask
-};
-// 特定の種類の持ち駒を 1 つ増やしたり減らしたりするときに使用するテーブル
-const u32 Hand::HandPieceOne[HandPieceNum] = {
-    1 << HPawnShiftBits,
-    1 << HLanceShiftBits,
-    1 << HKnightShiftBits,
-    1 << HSilverShiftBits,
-    1 << HGoldShiftBits,
-    1 << HBishopShiftBits,
-    1 << HRookShiftBits
-};
+#include "ifdef.hpp"
+#include "common.hpp"
+#include "bitboard.hpp"
+
+void initTable();
+
+#if defined FIND_MAGIC
+u64 findMagic(const Square sqare, const bool isBishop);
+#endif // #if defined FIND_MAGIC
+
+#endif // #ifndef APERY_INIT_HPP

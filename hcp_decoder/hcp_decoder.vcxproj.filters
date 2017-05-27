@@ -13,22 +13,37 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\elmo_for_learn">
+      <UniqueIdentifier>{56bbf84e-3cda-4bdd-b9ff-42f309d9221d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="hcp_decoder.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="position.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="bitboard.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
     </ClCompile>
     <ClCompile Include="hand.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="init.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
     </ClCompile>
     <ClCompile Include="move.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="mt64bit.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="pieceScore.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="position.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="square.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +75,18 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="move.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="score.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="pieceScore.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="mt64bit.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="init.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

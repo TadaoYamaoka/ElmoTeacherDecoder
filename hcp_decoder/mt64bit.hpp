@@ -19,35 +19,24 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "common.hpp"
-#include "piece.hpp"
-#include "hand.hpp"
+#ifndef APERY_MT64BIT_HPP
+#define APERY_MT64BIT_HPP
 
-const int Hand::HandPieceShiftBits[HandPieceNum] = {
-    HPawnShiftBits,
-    HLanceShiftBits,
-    HKnightShiftBits,
-    HSilverShiftBits,
-    HGoldShiftBits,
-    HBishopShiftBits,
-    HRookShiftBits
+#include "common.hpp"
+
+// 64bit のランダムな値を返す為のクラス
+class MT64bit : public std::mt19937_64 {
+public:
+    MT64bit() : std::mt19937_64() {}
+    explicit MT64bit(const unsigned int seed) : std::mt19937_64(seed) {}
+    u64 random() {
+        return (*this)();
+    }
+    u64 randomFewBits() {
+        return random() & random() & random();
+    }
 };
-const u32 Hand::HandPieceMask[HandPieceNum] = {
-    HPawnMask,
-    HLanceMask,
-    HKnightMask,
-    HSilverMask,
-    HGoldMask,
-    HBishopMask,
-    HRookMask
-};
-// 特定の種類の持ち駒を 1 つ増やしたり減らしたりするときに使用するテーブル
-const u32 Hand::HandPieceOne[HandPieceNum] = {
-    1 << HPawnShiftBits,
-    1 << HLanceShiftBits,
-    1 << HKnightShiftBits,
-    1 << HSilverShiftBits,
-    1 << HGoldShiftBits,
-    1 << HBishopShiftBits,
-    1 << HRookShiftBits
-};
+
+extern MT64bit g_mt64bit;
+
+#endif // #ifndef APERY_MT64BIT_HPP

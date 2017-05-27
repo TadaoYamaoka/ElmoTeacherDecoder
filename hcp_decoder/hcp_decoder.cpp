@@ -1,10 +1,11 @@
-#define BOOST_PYTHON_STATIC_LIB
+﻿#define BOOST_PYTHON_STATIC_LIB
 #define BOOST_NUMPY_STATIC_LIB
 #include <boost/python/numpy.hpp>
 #include <stdexcept>
 #include <algorithm>
 #include <unordered_map>
 
+#include "init.hpp"
 #include "piece.hpp"
 #include "color.hpp"
 #include "position.hpp"
@@ -18,7 +19,7 @@ void decode(np::ndarray ndhcpe, np::ndarray ndresult) {
 	int *result = reinterpret_cast<int *>(ndresult.get_data());
 	Position position;
 	for (int i = 0; i < nd; i++, hcpe++, result++) {
-		position.set(hcpe->hcp);
+		position.set(hcpe->hcp, nullptr);
 		*result = hcpe->gameResult;
 	}
 }
@@ -26,5 +27,10 @@ void decode(np::ndarray ndhcpe, np::ndarray ndresult) {
 BOOST_PYTHON_MODULE(hcp_decoder) {
 	Py_Initialize();
 	np::initialize();
+
+	initTable();
+	Position::initZobrist();
+	HuffmanCodedPos::init();
+
 	p::def("decode", decode);
 }
