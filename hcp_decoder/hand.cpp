@@ -19,18 +19,35 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef APERY_COLOR_HPP
-#define APERY_COLOR_HPP
+#include "common.hpp"
+#include "piece.hpp"
+#include "hand.hpp"
 
-#include "overloadEnumOperators.hpp"
-
-enum Color {
-    Black, White, ColorNum
+const int Hand::HandPieceShiftBits[HandPieceNum] = {
+    HPawnShiftBits,
+    HLanceShiftBits,
+    HKnightShiftBits,
+    HSilverShiftBits,
+    HGoldShiftBits,
+    HBishopShiftBits,
+    HRookShiftBits
 };
-OverloadEnumOperators(Color);
-
-inline constexpr Color oppositeColor(const Color c) {
-    return static_cast<Color>(static_cast<int>(c) ^ 1);
-}
-
-#endif // #ifndef APERY_COLOR_HPP
+const u32 Hand::HandPieceMask[HandPieceNum] = {
+    HPawnMask,
+    HLanceMask,
+    HKnightMask,
+    HSilverMask,
+    HGoldMask,
+    HBishopMask,
+    HRookMask
+};
+// 特定の種類の持ち駒を 1 つ増やしたり減らしたりするときに使用するテーブル
+const u32 Hand::HandPieceOne[HandPieceNum] = {
+    1 << HPawnShiftBits,
+    1 << HLanceShiftBits,
+    1 << HKnightShiftBits,
+    1 << HSilverShiftBits,
+    1 << HGoldShiftBits,
+    1 << HBishopShiftBits,
+    1 << HRookShiftBits
+};

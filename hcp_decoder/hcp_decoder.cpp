@@ -16,7 +16,9 @@ void decode(np::ndarray ndhcpe, np::ndarray ndresult) {
 	int nd = ndhcpe.get_nd();
 	HuffmanCodedPosAndEval *hcpe = reinterpret_cast<HuffmanCodedPosAndEval *>(ndhcpe.get_data());
 	int *result = reinterpret_cast<int *>(ndresult.get_data());
+	Position position;
 	for (int i = 0; i < nd; i++, hcpe++, result++) {
+		position.set(hcpe->hcp);
 		*result = hcpe->gameResult;
 	}
 }

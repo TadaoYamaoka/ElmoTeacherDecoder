@@ -1,46 +1,96 @@
-#pragma once
+/*
+  Apery, a USI shogi playing engine derived from Stockfish, a UCI chess playing engine.
+  Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
+  Copyright (C) 2008-2015 Marco Costalba, Joona Kiiski, Tord Romstad
+  Copyright (C) 2015-2016 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
+  Copyright (C) 2011-2016 Hiraoka Takuya
+
+  Apery is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Apery is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef APERY_PIECE_HPP
+#define APERY_PIECE_HPP
 
 #include "common.hpp"
 #include "overloadEnumOperators.hpp"
 #include "color.hpp"
+#include <iostream>
+#include <string>
+#include <cassert>
 
 enum PieceType {
-	// Pro* ‚Í Œ³‚Ì ‹î‚Ìí—Ş‚É 8 ‚ğ‰ÁZ‚µ‚½‚à‚ÌB
-	PTPromote = 8,
-	Occupied = 0, // Še PieceType ‚Ì or ‚ğ‚Æ‚Á‚½‚à‚ÌB
-	Pawn, Lance, Knight, Silver, Bishop, Rook, Gold, King,
-	ProPawn, ProLance, ProKnight, ProSilver, Horse, Dragon,
-	PieceTypeNum,
+    // Pro* ã¯ å…ƒã® é§’ã®ç¨®é¡ã« 8 ã‚’åŠ ç®—ã—ãŸã‚‚ã®ã€‚
+    PTPromote = 8,
+    Occupied = 0, // å„ PieceType ã® or ã‚’ã¨ã£ãŸã‚‚ã®ã€‚
+    Pawn, Lance, Knight, Silver, Bishop, Rook, Gold, King,
+    ProPawn, ProLance, ProKnight, ProSilver, Horse, Dragon,
+    PieceTypeNum,
 
-	GoldHorseDragon // ’P‚Étemnplateˆø”‚Æ‚µ‚Äg—p
+    GoldHorseDragon // å˜ã«temnplateå¼•æ•°ã¨ã—ã¦ä½¿ç”¨
 };
+OverloadEnumOperators(PieceType);
 
 enum Piece {
-	// B* ‚É 16 ‚ğ‰ÁZ‚·‚é‚±‚Æ‚ÅAW* ‚ğ•\‚·B
-	// Promoted ‚ğ‰ÁZ‚·‚é‚±‚Æ‚ÅA¬‚è‚ğ•\‚·B
-	Empty = 0, UnPromoted = 0, Promoted = 8,
-	BPawn = 1, BLance, BKnight, BSilver, BBishop, BRook, BGold, BKing,
-	BProPawn, BProLance, BProKnight, BProSilver, BHorse, BDragon, // BDragon = 14
-	WPawn = 17, WLance, WKnight, WSilver, WBishop, WRook, WGold, WKing,
-	WProPawn, WProLance, WProKnight, WProSilver, WHorse, WDragon,
-	PieceNone // PieceNone = 31  ‚±‚ê‚ğ 32 ‚É‚µ‚½•û‚ª‘½d”z—ñ‚Ì‚Æ‚«‚É—L—˜‚©B
+    // B* ã« 16 ã‚’åŠ ç®—ã™ã‚‹ã“ã¨ã§ã€W* ã‚’è¡¨ã™ã€‚
+    // Promoted ã‚’åŠ ç®—ã™ã‚‹ã“ã¨ã§ã€æˆã‚Šã‚’è¡¨ã™ã€‚
+    Empty = 0, UnPromoted = 0, Promoted = 8,
+    BPawn = 1, BLance, BKnight, BSilver, BBishop, BRook, BGold, BKing,
+    BProPawn, BProLance, BProKnight, BProSilver, BHorse, BDragon, // BDragon = 14
+    WPawn = 17, WLance, WKnight, WSilver, WBishop, WRook, WGold, WKing,
+    WProPawn, WProLance, WProKnight, WProSilver, WHorse, WDragon,
+    PieceNone // PieceNone = 31  ã“ã‚Œã‚’ 32 ã«ã—ãŸæ–¹ãŒå¤šé‡é…åˆ—ã®ã¨ãã«æœ‰åˆ©ã‹ã€‚
 };
 OverloadEnumOperators(Piece);
 
+inline Piece inverse(const Piece pc) { return static_cast<Piece>(pc ^ 0x10); }
+
+// æŒã¡é§’ã‚’è¡¨ã™ã¨ãã«ä½¿ç”¨ã™ã‚‹ã€‚
+// todo: HGold ã‚’ HRook ã®å¾Œã‚ã«æŒã£ã¦ã„ãã€PieceType ã¨ã®å¤‰æ›ã‚’ç°¡å˜ã«å‡ºæ¥ã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
 enum HandPiece {
-	HPawn, HLance, HKnight, HSilver, HGold, HBishop, HRook, HandPieceNum
+    HPawn, HLance, HKnight, HSilver, HGold, HBishop, HRook, HandPieceNum
 };
 OverloadEnumOperators(HandPiece);
 
-// p == Empty ‚Ì‚Æ‚«APieceType ‚Í OccuPied ‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅA
-// Position::bbOf(pieceToPieceType(p)) ‚Æ‚·‚é‚ÆA
-// Position::emptyBB() ‚Å‚Í‚È‚­ Position::occupiedBB() ‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅA
-// ’ˆÓ‚·‚é‚±‚ÆBo—ˆ‚ê‚ÎC³‚µ‚½‚¢B
+// p == Empty ã®ã¨ãã€PieceType ã¯ OccuPied ã«ãªã£ã¦ã—ã¾ã†ã®ã§ã€
+// Position::bbOf(pieceToPieceType(p)) ã¨ã™ã‚‹ã¨ã€
+// Position::emptyBB() ã§ã¯ãªã Position::occupiedBB() ã«ãªã£ã¦ã—ã¾ã†ã®ã§ã€
+// æ³¨æ„ã™ã‚‹ã“ã¨ã€‚å‡ºæ¥ã‚Œã°ä¿®æ­£ã—ãŸã„ã€‚
 inline PieceType pieceToPieceType(const Piece p) { return static_cast<PieceType>(p & 15); }
+
+inline Color pieceToColor(const Piece p) {
+    assert(p != Empty);
+    return static_cast<Color>(p >> 4);
+}
 
 inline Piece colorAndPieceTypeToPiece(const Color c, const PieceType pt) { return static_cast<Piece>((c << 4) | pt); }
 
+const u32 IsSliderVal = 0x60646064;
+// pc ãŒé éš”é§’ã§ã‚ã‚‹ã‹
+inline bool isSlider(const Piece     pc) { return (IsSliderVal & (1 << pc)) != 0; }
+inline bool isSlider(const PieceType pt) { return (IsSliderVal & (1 << pt)) != 0; }
+
+const HandPiece PieceTypeToHandPieceTable[PieceTypeNum] = {
+    HandPieceNum, HPawn, HLance, HKnight, HSilver, HBishop, HRook, HGold, HandPieceNum, HPawn, HLance, HKnight, HSilver, HBishop, HRook
+};
+inline HandPiece pieceTypeToHandPiece(const PieceType pt) { return PieceTypeToHandPieceTable[pt]; }
+
 const PieceType HandPieceToPieceTypeTable[HandPieceNum] = {
-	Pawn, Lance, Knight, Silver, Gold, Bishop, Rook
+    Pawn, Lance, Knight, Silver, Gold, Bishop, Rook
 };
 inline PieceType handPieceToPieceType(const HandPiece hp) { return HandPieceToPieceTypeTable[hp]; }
+inline Piece colorAndHandPieceToPiece(const Color c, const HandPiece hp) {
+    return colorAndPieceTypeToPiece(c, handPieceToPieceType(hp));
+}
+
+#endif // #ifndef APERY_PIECE_HPP
