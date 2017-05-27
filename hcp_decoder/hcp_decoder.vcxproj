@@ -104,7 +104,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;HCP_DECODER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;HCP_DECODER_EXPORTS;HAVE_SSE4;HAVE_BMI2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -140,7 +140,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;HCP_DECODER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;HCP_DECODER_EXPORTS;HAVE_SSE4;HAVE_BMI2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -157,6 +157,7 @@
     <ClCompile Include="bitboard.cpp" />
     <ClCompile Include="hand.cpp" />
     <ClCompile Include="hcp_decoder.cpp" />
+    <ClCompile Include="move.cpp" />
     <ClCompile Include="position.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="common.hpp" />
     <ClInclude Include="hand.hpp" />
     <ClInclude Include="ifdef.hpp" />
+    <ClInclude Include="move.hpp" />
     <ClInclude Include="overloadEnumOperators.hpp" />
     <ClInclude Include="piece.hpp" />
     <ClInclude Include="position.hpp" />
