@@ -29,18 +29,17 @@ HuffmanCodedPosAndEval = np.dtype([
 
 start = time.time()
 
-with open(args.file, 'rb') as f:
-    hcpevec = np.fromfile(args.file, dtype=HuffmanCodedPosAndEval)
-    features1 = np.empty((len(hcpevec), 2, 14, 81), dtype=np.float32)
-    features2 = np.empty((len(hcpevec), 2 * MAX_PIECES_IN_HAND_SUM + 1, 81), dtype=np.float32)
+hcpevec = np.fromfile(args.file, dtype=HuffmanCodedPosAndEval)
+features1 = np.empty((len(hcpevec), 2, 14, 81), dtype=np.float32)
+features2 = np.empty((len(hcpevec), 2 * MAX_PIECES_IN_HAND_SUM + 1, 81), dtype=np.float32)
 
-    result = np.empty(len(hcpevec), dtype=np.float32)
-    move = np.empty(len(hcpevec), dtype=np.int32)
-    value = np.empty(len(hcpevec), dtype=np.float32)
+result = np.empty(len(hcpevec), dtype=np.float32)
+move = np.empty(len(hcpevec), dtype=np.int32)
+value = np.empty(len(hcpevec), dtype=np.float32)
 
-    #hcp_decoder.decode_with_result(hcpevec, features1, features2, result)
-    #hcp_decoder.decode_with_move(hcpevec, features1, features2, move)
-    hcp_decoder.decode_with_value(hcpevec, features1, features2, value, move, result)
+#hcp_decoder.decode_with_result(hcpevec, features1, features2, result)
+#hcp_decoder.decode_with_move(hcpevec, features1, features2, move)
+hcp_decoder.decode_with_value(hcpevec, features1, features2, value, move, result)
 
 elapsed_time = time.time() - start
 print("elapsed_time:{0}".format(elapsed_time) + "[sec]")
