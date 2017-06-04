@@ -335,6 +335,16 @@ void decode_with_value(np::ndarray ndhcpe, np::ndarray ndfeatures1, np::ndarray 
 	}
 }
 
+void print_sfen_from_hcp(np::ndarray ndhcp) {
+	const int len = (int)ndhcp.shape(0);
+	HuffmanCodedPos *hcp = reinterpret_cast<HuffmanCodedPos *>(ndhcp.get_data());
+	Position position;
+	for (int i = 0; i < len; i++, hcp++) {
+		position.set(*hcp, nullptr);
+		std::cout << position.toSFEN() << std::endl;
+	}
+}
+
 BOOST_PYTHON_MODULE(hcp_decoder) {
 	Py_Initialize();
 	np::initialize();
@@ -346,4 +356,5 @@ BOOST_PYTHON_MODULE(hcp_decoder) {
 	p::def("decode_with_result", decode_with_result);
 	p::def("decode_with_move", decode_with_move);
 	p::def("decode_with_value", decode_with_value);
+	p::def("print_sfen_from_hcp", print_sfen_from_hcp);
 }

@@ -27,6 +27,9 @@
   <ItemGroup>
     <Compile Include="ElmoTeacherDecoder2.py" />
     <Compile Include="ElmoTeacherDecoder.py" />
+    <Compile Include="print_sfen_from_hcp.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="test3.py" />
     <Compile Include="test2.py" />
     <Compile Include="winrate.py" />
