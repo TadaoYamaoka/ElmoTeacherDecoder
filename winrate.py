@@ -18,7 +18,7 @@ args = parser.parse_args()
 
 sum_win = defaultdict(lambda: 0)
 num_win = defaultdict(lambda: 0)
-
+sum_win_all = 0
 with open(args.file, 'rb') as f:
     filesize = os.fstat(f.fileno()).st_size
     if args.num:
@@ -40,6 +40,10 @@ with open(args.file, 'rb') as f:
         eval100 = int(eval/100)
         sum_win[eval100] += win
         num_win[eval100] += 1
+        if win > 0:
+            sum_win_all += 1
+
+print('win avr.', float(sum_win_all) / num)
 
 avr_win = {}
 for eval100 in sum_win.keys():
