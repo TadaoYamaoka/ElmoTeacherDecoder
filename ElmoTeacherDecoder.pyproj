@@ -30,6 +30,7 @@
     <Compile Include="print_sfen_from_hcp.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="check_duplicates.py" />
     <Compile Include="test3.py" />
     <Compile Include="test2.py" />
     <Compile Include="winrate.py" />

@@ -14,6 +14,8 @@ HuffmanCodedPos = np.dtype([
 
 hcpvec = np.fromfile(args.file, dtype=HuffmanCodedPos)
 
+print('data len =', len(hcpvec))
+
 if args.num is None:
     len = len(hcpvec)
 else:
