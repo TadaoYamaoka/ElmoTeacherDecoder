@@ -5,6 +5,7 @@ import argparse
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 from chainer import Variable
 from chainer import optimizers
@@ -37,7 +38,7 @@ with open(args.file, 'rb') as f:
         if board.turn == shogi.WHITE:
             win *= -1
 
-        eval100 = int(eval/100)
+        eval100 = int((eval + math.copysign(0.5, eval))/100)
         sum_win[eval100] += win
         num_win[eval100] += 1
         if win > 0:
@@ -74,7 +75,7 @@ print(f.W.data)
 
 plt.plot(x, t, '.')
 plt.plot(x, F.tanh(f(val_x)).data)
-plt.xlim(-3500, 3500)
+plt.xlim(-5000, 5000)
 plt.show()
 
 # sigmoid
@@ -97,5 +98,5 @@ print(f.W.data)
 
 plt.plot(x, t, '.')
 plt.plot(x, F.sigmoid(f(val_x)).data)
-plt.xlim(-3500, 3500)
+plt.xlim(-5000, 5000)
 plt.show()
