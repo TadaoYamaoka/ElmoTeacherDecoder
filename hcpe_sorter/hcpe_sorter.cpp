@@ -1,11 +1,5 @@
 #include "position.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <io.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-
 #include <algorithm>
 #include <random>
 #include <string>
@@ -16,68 +10,42 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	int *num = new int[argc - 2];
-	int sum_num = 0;
+	char* infile = argv[1];
+	int num_per_file = std::atoi(argv[2]);
 
-	for (int i = 1; i < argc - 1; i++) {
-		int fd = open(argv[i], O_RDONLY);
-		if (fd == -1) {
-			fprintf(stderr, "open error\n");
-			exit(1);
-		}
-		struct stat stbuf;
-		fstat(fd, &stbuf);
-		int num_tmp = stbuf.st_size / sizeof(HuffmanCodedPosAndEval);
-
-		num[i - 1] = num_tmp;
-		sum_num += num_tmp;
-
-		close(fd);
+	std::ifstream ifs(infile, std::ifstream::in | std::ifstream::binary | std::ios::ate);
+	if (!ifs) {
+		std::cerr << "Error: cannot open " << infile << std::endl;
+		exit(EXIT_FAILURE);
 	}
+	const s64 entryNum = ifs.tellg() / sizeof(HuffmanCodedPosAndEval);
 
-	HuffmanCodedPosAndEval *hcpe_vec_all = new HuffmanCodedPosAndEval[sum_num + 1];
-	HuffmanCodedPosAndEval *hcpe_vec = hcpe_vec_all;
+	std::cout << entryNum << std::endl;
 
-	for (int i = 0; i < argc - 2; i++) {
-
-		FILE *fp = fopen(argv[i + 1], "rb");
-		if (fp == NULL) {
-			fprintf(stderr, "fopen error\n");
-			exit(1);
-		}
-
-		if (fread(hcpe_vec, sizeof(HuffmanCodedPosAndEval), num[i], fp) != num[i]) {
-			fprintf(stderr, "fread error\n");
-			exit(1);
-		}
-
-		hcpe_vec += num[i];
-
-		fclose(fp);
-	}
+	// ‘S‚Ä“Ç‚Þ
+	ifs.seekg(std::ios_base::beg);
+	HuffmanCodedPosAndEval *hcpevec = new HuffmanCodedPosAndEval[entryNum];
+	ifs.read(reinterpret_cast<char*>(hcpevec), sizeof(HuffmanCodedPosAndEval) * entryNum);
+	ifs.close();
 
 	// shuffle
-	std::shuffle(hcpe_vec_all, hcpe_vec_all + sum_num, std::mt19937());
+	std::shuffle(hcpevec, hcpevec + entryNum, std::mt19937());
 
-	hcpe_vec = hcpe_vec_all;
-	std::string outdir = argv[argc - 1];
-	for (int i = 0; i < argc - 2; i++) {
-		char fname[256];
-		_splitpath(argv[i + 1], NULL, NULL, fname, NULL);
-		FILE *fp = fopen((outdir + "/" + fname).c_str(), "wb");
-		if (fp == NULL) {
-			fprintf(stderr, "fopen error\n");
-			exit(1);
+	// o—Í
+	for (int i = 0; i < (entryNum + num_per_file - 1) / num_per_file; i++, hcpevec += num_per_file) {
+		std::ostringstream sout;
+		sout << infile << "-" << std::setfill('0') << std::setw(3) << i + 1;
+		std::ofstream ofs(sout.str(), std::ios::binary);
+		if (!ofs) {
+			std::cerr << "Error: cannot open " << sout.str() << std::endl;
+			exit(EXIT_FAILURE);
 		}
-
-		if (fwrite(hcpe_vec, sizeof(HuffmanCodedPosAndEval), num[i], fp) == 0) {
-			fprintf(stderr, "fread error\n");
-			exit(1);
+		int num = num_per_file;
+		if (num_per_file * (i + 1) > entryNum) {
+			num = entryNum - num_per_file * i;
 		}
-
-		hcpe_vec += num[i];
-
-		fclose(fp);
+		std::cout << num << std::endl;
+		ofs.write(reinterpret_cast<char*>(hcpevec), sizeof(HuffmanCodedPosAndEval) * num);
 	}
 
 	return 0;
