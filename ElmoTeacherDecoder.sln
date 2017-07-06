@@ -7,7 +7,7 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ElmoTeacherDecoder", "ElmoT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hcp_decoder", "hcp_decoder\hcp_decoder.vcxproj", "{54C4C9E6-37B0-47A1-9667-7B3E510AB1CB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hcp_sorter", "hcp_sorter\hcp_sorter.vcxproj", "{6E7D3435-41A3-4FC0-93AC-7CCAB8F50069}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hcpe_sorter", "hcpe_sorter\hcpe_sorter.vcxproj", "{6E7D3435-41A3-4FC0-93AC-7CCAB8F50069}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hcpe_uniq", "hcpe_uniq\hcpe_uniq.vcxproj", "{D228B304-E04D-48E2-8CD9-BF4C3E3926E4}"
 EndProject

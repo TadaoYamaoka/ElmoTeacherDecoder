@@ -42,7 +42,7 @@
     <ClCompile Include="..\hcp_decoder\square.cpp">
       <Filter>ソース ファイル\elmo</Filter>
     </ClCompile>
-    <ClCompile Include="hcp_sorter.cpp">
+    <ClCompile Include="hcpe_sorter.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

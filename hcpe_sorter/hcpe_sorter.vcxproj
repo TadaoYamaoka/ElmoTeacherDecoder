@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6E7D3435-41A3-4FC0-93AC-7CCAB8F50069}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>hcp_sorter</RootNamespace>
+    <RootNamespace>hcpe_sorter</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -152,7 +152,7 @@
     <ClCompile Include="..\hcp_decoder\pieceScore.cpp" />
     <ClCompile Include="..\hcp_decoder\position.cpp" />
     <ClCompile Include="..\hcp_decoder\square.cpp" />
-    <ClCompile Include="hcp_sorter.cpp" />
+    <ClCompile Include="hcpe_sorter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
