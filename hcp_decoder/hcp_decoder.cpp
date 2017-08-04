@@ -371,6 +371,13 @@ void check_duplicates(np::ndarray ndhcpe) {
 	std::cout << "dup_cnt:" << dup_cnt << std::endl;
 }
 
+void sfen_to_hcp(const char* sfen, np::ndarray ndhcp) {
+	HuffmanCodedPos *hcp = reinterpret_cast<HuffmanCodedPos *>(ndhcp.get_data());
+	Position position;
+	position.set(sfen, nullptr);
+	*hcp = position.toHuffmanCodedPos();
+}
+
 BOOST_PYTHON_MODULE(hcp_decoder) {
 	Py_Initialize();
 	np::initialize();
@@ -384,4 +391,5 @@ BOOST_PYTHON_MODULE(hcp_decoder) {
 	p::def("decode_with_value", decode_with_value);
 	p::def("print_sfen_from_hcp", print_sfen_from_hcp);
 	p::def("check_duplicates", check_duplicates);
+	p::def("sfen_to_hcp", sfen_to_hcp);
 }

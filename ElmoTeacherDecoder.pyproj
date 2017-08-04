@@ -30,6 +30,7 @@
     <Compile Include="hcp_unique.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="kif_to_hcp.py" />
     <Compile Include="print_sfen_from_hcp.py">
       <SubType>Code</SubType>
     </Compile>
