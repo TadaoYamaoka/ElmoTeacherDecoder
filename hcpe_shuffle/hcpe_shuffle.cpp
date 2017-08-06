@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 	}
 
 	char* infile = argv[1];
-	int num_per_file = std::atoi(argv[2]);
+	s64 num_per_file = std::atoi(argv[2]);
 	int divNum = std::atoi(argv[3]);
 
 	std::ifstream ifs(infile, std::ifstream::in | std::ifstream::binary | std::ios::ate);
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
 	// èoóÕ
 	HuffmanCodedPosAndEval *hcpevec = new HuffmanCodedPosAndEval[num_per_file];
-	for (int i = 0; i < (entryNum + num_per_file - 1) / num_per_file; i++) {
+	for (s64 i = 0; i < (entryNum + num_per_file - 1) / num_per_file; i++) {
 		std::ostringstream sout;
 		sout << infile << "-" << std::setfill('0') << std::setw(3) << i + 1;
 		std::ofstream ofs(sout.str(), std::ios::binary);
