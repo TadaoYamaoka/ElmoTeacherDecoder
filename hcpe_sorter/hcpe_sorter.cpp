@@ -29,7 +29,9 @@ int main(int argc, char** argv)
 	ifs.close();
 
 	// shuffle
-	std::shuffle(hcpevec, hcpevec + entryNum, std::mt19937());
+	std::random_device seed_gen;
+	std::mt19937 engine(seed_gen());
+	std::shuffle(hcpevec, hcpevec + entryNum, engine);
 
 	// o—Í
 	for (int i = 0; i < (entryNum + num_per_file - 1) / num_per_file; i++, hcpevec += num_per_file) {

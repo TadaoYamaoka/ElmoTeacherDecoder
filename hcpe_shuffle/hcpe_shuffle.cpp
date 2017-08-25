@@ -36,7 +36,9 @@ int main(int argc, char** argv)
 	}
 
 	// shuffle
-	std::shuffle(indexes, indexes + entryNum, std::mt19937());
+	std::random_device seed_gen;
+	std::mt19937 engine(seed_gen());
+	std::shuffle(indexes, indexes + entryNum, engine);
 
 	// ファイルサイズが物理メモリを超えても処理できるように分割して処理(分割数は適宜調整する)
 	const s64 blockNum = (entryNum + divNum - 1) / divNum;
@@ -46,7 +48,7 @@ int main(int argc, char** argv)
 	HuffmanCodedPosAndEval *hcpevec = new HuffmanCodedPosAndEval[num_per_file];
 	for (s64 i = 0; i < (entryNum + num_per_file - 1) / num_per_file; i++) {
 		std::ostringstream sout;
-		sout << infile << "-" << std::setfill('0') << std::setw(3) << i + 1;
+		sout << infile << "-" << std::setfill('0') << std::setw(2) << i + 1;
 		std::ofstream ofs(sout.str(), std::ios::binary);
 		if (!ofs) {
 			std::cerr << "Error: cannot open " << sout.str() << std::endl;
