@@ -6,6 +6,7 @@
 
 #include "init.hpp"
 #include "position.hpp"
+#include "move.hpp"
 
 namespace p = boost::python;
 namespace np = boost::python::numpy;
@@ -345,6 +346,19 @@ void print_sfen_from_hcp(np::ndarray ndhcp) {
 	}
 }
 
+void print_sfen_from_hcpe(np::ndarray ndhcpe) {
+	const int len = (int)ndhcpe.shape(0);
+	HuffmanCodedPosAndEval *hcpe = reinterpret_cast<HuffmanCodedPosAndEval *>(ndhcpe.get_data());
+	Position position;
+	for (int i = 0; i < len; i++, hcpe++) {
+		position.set(hcpe->hcp, nullptr);
+
+		const Move move = Move(hcpe->bestMove16);
+
+		std::cout << position.toSFEN() << " : " << hcpe->eval << " : " << hcpe->gameResult << " : " << move.toUSI() << std::endl;
+	}
+}
+
 bool operator<(const HuffmanCodedPos& l, const HuffmanCodedPos& r) {
 	for (int i = 0; i < 32; i++) {
 		if (l.data[i] < r.data[i]) {
@@ -390,6 +404,7 @@ BOOST_PYTHON_MODULE(hcp_decoder) {
 	p::def("decode_with_move", decode_with_move);
 	p::def("decode_with_value", decode_with_value);
 	p::def("print_sfen_from_hcp", print_sfen_from_hcp);
+	p::def("print_sfen_from_hcpe", print_sfen_from_hcpe);
 	p::def("check_duplicates", check_duplicates);
 	p::def("sfen_to_hcp", sfen_to_hcp);
 }
