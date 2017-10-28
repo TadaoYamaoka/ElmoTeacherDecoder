@@ -359,6 +359,26 @@ void print_sfen_from_hcpe(np::ndarray ndhcpe) {
 	}
 }
 
+void print_sfen_from_hcphe(np::ndarray ndhcphe) {
+	const int len = (int)ndhcphe.shape(0);
+	std::cout << "len = " << len << std::endl;
+	HuffmanCodedPosWithHistoryAndEval *hcphe = reinterpret_cast<HuffmanCodedPosWithHistoryAndEval *>(ndhcphe.get_data());
+	Position position;
+	for (int i = 0; i < len; i++, hcphe++) {
+		position.set(hcphe->hcp, nullptr);
+		std::cout << position.toSFEN() << " : ";
+
+		for (int j = 0; j < 7; j++) {
+			const Move move = Move(hcphe->historyMove16[j]);
+			std::cout << move.toUSI() << " : ";
+		}
+
+		const Move move = Move(hcphe->bestMove16);
+
+		std::cout << hcphe->gameResult << " : " << move.toUSI() << std::endl;
+	}
+}
+
 bool operator<(const HuffmanCodedPos& l, const HuffmanCodedPos& r) {
 	for (int i = 0; i < 32; i++) {
 		if (l.data[i] < r.data[i]) {
@@ -405,6 +425,7 @@ BOOST_PYTHON_MODULE(hcp_decoder) {
 	p::def("decode_with_value", decode_with_value);
 	p::def("print_sfen_from_hcp", print_sfen_from_hcp);
 	p::def("print_sfen_from_hcpe", print_sfen_from_hcpe);
+	p::def("print_sfen_from_hcphe", print_sfen_from_hcphe);
 	p::def("check_duplicates", check_duplicates);
 	p::def("sfen_to_hcp", sfen_to_hcp);
 }
