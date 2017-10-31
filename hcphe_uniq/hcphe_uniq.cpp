@@ -1,6 +1,6 @@
 #include "position.hpp"
 
-bool operator <(const HuffmanCodedPosAndEval& l, const HuffmanCodedPosAndEval& r) {
+bool operator <(const HuffmanCodedPosWithHistoryAndEval& l, const HuffmanCodedPosWithHistoryAndEval& r) {
 	const long long* lhcp = (const long long*)&l.hcp;
 	const long long* rhcp = (const long long*)&r.hcp;
 
@@ -8,6 +8,16 @@ bool operator <(const HuffmanCodedPosAndEval& l, const HuffmanCodedPosAndEval& r
 		if (lhcp[i] < rhcp[i])
 			return true;
 		else if (lhcp[i] > rhcp[i])
+			return false;
+	}
+
+	const u16* lhistMove = (const u16*)l.historyMove16;
+	const u16* rhistMove = (const u16*)r.historyMove16;
+
+	for (int i = 0; i < 7; i++) {
+		if (lhistMove[i] < rhistMove[i])
+			return true;
+		else if (lhistMove[i] > rhistMove[i])
 			return false;
 	}
 
@@ -20,12 +30,20 @@ bool operator <(const HuffmanCodedPosAndEval& l, const HuffmanCodedPosAndEval& r
 	return false;
 }
 
-bool operator ==(const HuffmanCodedPosAndEval& l, const HuffmanCodedPosAndEval& r) {
+bool operator ==(const HuffmanCodedPosWithHistoryAndEval& l, const HuffmanCodedPosWithHistoryAndEval& r) {
 	const long long* lhcp = (const long long*)&l.hcp;
 	const long long* rhcp = (const long long*)&r.hcp;
 
 	for (int i = 0; i < 4; i++) {
 		if (lhcp[i] != rhcp[i])
+			return false;
+	}
+
+	const u16* lhistMove = (const u16*)l.historyMove16;
+	const u16* rhistMove = (const u16*)r.historyMove16;
+
+	for (int i = 0; i < 7; i++) {
+		if (lhistMove[i] != rhistMove[i])
 			return false;
 	}
 
@@ -50,22 +68,22 @@ int main(int argc, char** argv)
 		std::cerr << "Error: cannot open " << infile << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	const s64 entryNum = ifs.tellg() / sizeof(HuffmanCodedPosAndEval);
+	const s64 entryNum = ifs.tellg() / sizeof(HuffmanCodedPosWithHistoryAndEval);
 
 	std::cout << entryNum << std::endl;
 
 	// 全て読む
 	ifs.seekg(std::ios_base::beg);
-	HuffmanCodedPosAndEval *hcpevec = new HuffmanCodedPosAndEval[entryNum];
-	ifs.read(reinterpret_cast<char*>(hcpevec), sizeof(HuffmanCodedPosAndEval) * entryNum);
+	HuffmanCodedPosWithHistoryAndEval *hcphevec = new HuffmanCodedPosWithHistoryAndEval[entryNum];
+	ifs.read(reinterpret_cast<char*>(hcphevec), sizeof(HuffmanCodedPosAndEval) * entryNum);
 	ifs.close();
 
 	// ソート
-	std::sort(hcpevec, hcpevec + entryNum);
+	std::sort(hcphevec, hcphevec + entryNum);
 
 	// uniq
-	HuffmanCodedPosAndEval* end = std::unique(hcpevec, hcpevec + entryNum);
-	const s64 uniqNum = end - hcpevec;
+	HuffmanCodedPosWithHistoryAndEval* end = std::unique(hcphevec, hcphevec + entryNum);
+	const s64 uniqNum = end - hcphevec;
 
 	std::cout << uniqNum << std::endl;
 
@@ -75,7 +93,7 @@ int main(int argc, char** argv)
 		std::cerr << "Error: cannot open " << outfile << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	ofs.write(reinterpret_cast<char*>(hcpevec), sizeof(HuffmanCodedPosAndEval) * uniqNum);
+	ofs.write(reinterpret_cast<char*>(hcphevec), sizeof(HuffmanCodedPosWithHistoryAndEval) * uniqNum);
 
 	return 0;
 }
