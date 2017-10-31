@@ -26,6 +26,8 @@ bool operator <(const HuffmanCodedPosWithHistoryAndEval& l, const HuffmanCodedPo
 
 	if (lbestMove16 < rbestMove16)
 		return true;
+	else if (lbestMove16 > rbestMove16)
+		return false;
 
 	return false;
 }
@@ -75,7 +77,7 @@ int main(int argc, char** argv)
 	// 全て読む
 	ifs.seekg(std::ios_base::beg);
 	HuffmanCodedPosWithHistoryAndEval *hcphevec = new HuffmanCodedPosWithHistoryAndEval[entryNum];
-	ifs.read(reinterpret_cast<char*>(hcphevec), sizeof(HuffmanCodedPosAndEval) * entryNum);
+	ifs.read(reinterpret_cast<char*>(hcphevec), sizeof(HuffmanCodedPosWithHistoryAndEval) * entryNum);
 	ifs.close();
 
 	// ソート
