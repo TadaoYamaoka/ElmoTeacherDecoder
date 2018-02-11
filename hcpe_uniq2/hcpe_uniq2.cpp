@@ -1,4 +1,4 @@
-#include "position.hpp"
+Ôªø#include "position.hpp"
 
 bool operator <(const HuffmanCodedPosAndEval& l, const HuffmanCodedPosAndEval& r) {
 	const long long* lhcp = (const long long*)&l.hcp;
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 	char* comparefile = argv[2];
 	char* outfile = argv[3];
 
-	// ì¸óÕÉtÉ@ÉCÉã
+	// ÂÖ•Âäõ„Éï„Ç°„Ç§„É´
 	std::ifstream ifs(infile, std::ifstream::in | std::ifstream::binary | std::ios::ate);
 	if (!ifs) {
 		std::cerr << "Error: cannot open " << infile << std::endl;
@@ -42,13 +42,13 @@ int main(int argc, char** argv)
 
 	std::cout << entryNum << std::endl;
 
-	// ëSÇƒì«Çﬁ
+	// ÂÖ®„Å¶Ë™≠„ÇÄ
 	ifs.seekg(std::ios_base::beg);
 	HuffmanCodedPosAndEval *hcpevec = new HuffmanCodedPosAndEval[entryNum];
 	ifs.read(reinterpret_cast<char*>(hcpevec), sizeof(HuffmanCodedPosAndEval) * entryNum);
 	ifs.close();
 
-	// É\Å[Ég
+	// „ÇΩ„Éº„Éà
 	std::sort(hcpevec, hcpevec + entryNum);
 
 	// uniq
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 	std::cout << uniqNum << std::endl;
 
 
-	// î‰ärÉtÉ@ÉCÉã
+	// ÊØîËºÉ„Éï„Ç°„Ç§„É´
 	std::ifstream ifs_comp(comparefile, std::ifstream::in | std::ifstream::binary | std::ios::ate);
 	if (!ifs_comp) {
 		std::cerr << "Error: cannot open " << comparefile << std::endl;
@@ -68,17 +68,17 @@ int main(int argc, char** argv)
 
 	std::cout << entryNumComp << std::endl;
 
-	// ëSÇƒì«Çﬁ
+	// ÂÖ®„Å¶Ë™≠„ÇÄ
 	ifs_comp.seekg(std::ios_base::beg);
 	HuffmanCodedPosAndEval *hcpevecComp = new HuffmanCodedPosAndEval[entryNumComp];
 	ifs_comp.read(reinterpret_cast<char*>(hcpevecComp), sizeof(HuffmanCodedPosAndEval) * entryNumComp);
 	ifs_comp.close();
 
-	// É\Å[Ég
+	// „ÇΩ„Éº„Éà
 	std::sort(hcpevecComp, hcpevecComp + entryNumComp);
 
 
-	// èoóÕ
+	// Âá∫Âäõ
 	std::ofstream ofs(outfile, std::ios::binary);
 	if (!ofs) {
 		std::cerr << "Error: cannot open " << outfile << std::endl;

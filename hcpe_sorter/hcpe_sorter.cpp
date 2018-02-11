@@ -1,4 +1,4 @@
-#include "position.hpp"
+Ôªø#include "position.hpp"
 
 #include <algorithm>
 #include <random>
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
 	std::cout << entryNum << std::endl;
 
-	// ëSÇƒì«Çﬁ
+	// ÂÖ®„Å¶Ë™≠„ÇÄ
 	ifs.seekg(std::ios_base::beg);
 	HuffmanCodedPosAndEval *hcpevec = new HuffmanCodedPosAndEval[entryNum];
 	ifs.read(reinterpret_cast<char*>(hcpevec), sizeof(HuffmanCodedPosAndEval) * entryNum);
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 	std::mt19937 engine(seed_gen());
 	std::shuffle(hcpevec, hcpevec + entryNum, engine);
 
-	// èoóÕ
+	// Âá∫Âäõ
 	for (int i = 0; i < (entryNum + num_per_file - 1) / num_per_file; i++, hcpevec += num_per_file) {
 		std::ostringstream sout;
 		sout << infile << "-" << std::setfill('0') << std::setw(3) << i + 1;

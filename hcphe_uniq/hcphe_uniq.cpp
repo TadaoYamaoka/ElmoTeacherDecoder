@@ -1,4 +1,4 @@
-#include "position.hpp"
+Ôªø#include "position.hpp"
 
 bool operator <(const HuffmanCodedPosWithHistoryAndEval& l, const HuffmanCodedPosWithHistoryAndEval& r) {
 	const long long* lhcp = (const long long*)&l.hcp;
@@ -74,13 +74,13 @@ int main(int argc, char** argv)
 
 	std::cout << entryNum << std::endl;
 
-	// ëSÇƒì«Çﬁ
+	// ÂÖ®„Å¶Ë™≠„ÇÄ
 	ifs.seekg(std::ios_base::beg);
 	HuffmanCodedPosWithHistoryAndEval *hcphevec = new HuffmanCodedPosWithHistoryAndEval[entryNum];
 	ifs.read(reinterpret_cast<char*>(hcphevec), sizeof(HuffmanCodedPosWithHistoryAndEval) * entryNum);
 	ifs.close();
 
-	// É\Å[Ég
+	// „ÇΩ„Éº„Éà
 	std::sort(hcphevec, hcphevec + entryNum);
 
 	// uniq
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
 	std::cout << uniqNum << std::endl;
 
-	// èoóÕ
+	// Âá∫Âäõ
 	std::ofstream ofs(outfile, std::ios::binary);
 	if (!ofs) {
 		std::cerr << "Error: cannot open " << outfile << std::endl;

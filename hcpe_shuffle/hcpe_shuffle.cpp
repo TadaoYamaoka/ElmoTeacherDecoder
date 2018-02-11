@@ -1,4 +1,4 @@
-#include "position.hpp"
+ï»¿#include "position.hpp"
 
 #include <algorithm>
 #include <random>
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	// ƒCƒ“ƒfƒbƒNƒX”z—ñ
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹é…åˆ—
 	u32* indexes = new u32[entryNum];
 	for (s64 i = 0; i < entryNum; i++) {
 		indexes[i] = (u32)i;
@@ -40,11 +40,11 @@ int main(int argc, char** argv)
 	std::mt19937 engine(seed_gen());
 	std::shuffle(indexes, indexes + entryNum, engine);
 
-	// ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ª•¨—ƒƒ‚ƒŠ‚ğ’´‚¦‚Ä‚àˆ—‚Å‚«‚é‚æ‚¤‚É•ªŠ„‚µ‚Äˆ—(•ªŠ„”‚Í“K‹X’²®‚·‚é)
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºãŒç‰©ç†ãƒ¡ãƒ¢ãƒªã‚’è¶…ãˆã¦ã‚‚å‡¦ç†ã§ãã‚‹ã‚ˆã†ã«åˆ†å‰²ã—ã¦å‡¦ç†(åˆ†å‰²æ•°ã¯é©å®œèª¿æ•´ã™ã‚‹)
 	const s64 blockNum = (entryNum + divNum - 1) / divNum;
 	HuffmanCodedPosAndEval *inhcpevec = new HuffmanCodedPosAndEval[blockNum];
 
-	// o—Í
+	// å‡ºåŠ›
 	HuffmanCodedPosAndEval *hcpevec = new HuffmanCodedPosAndEval[num_per_file];
 	for (s64 i = 0; i < (entryNum + num_per_file - 1) / num_per_file; i++) {
 		std::ostringstream sout;
@@ -60,9 +60,9 @@ int main(int argc, char** argv)
 		}
 		std::cout << num << std::endl;
 
-		// •ªŠ„‚µ‚Äˆ—
+		// åˆ†å‰²ã—ã¦å‡¦ç†
 		for (int j = 0; j < divNum; j++) {
-			// “Ç‚İ‚İ
+			// èª­ã¿è¾¼ã¿
 			s64 readNum = blockNum;
 			if (j + 1 == divNum) {
 				readNum = entryNum - blockNum * j;
