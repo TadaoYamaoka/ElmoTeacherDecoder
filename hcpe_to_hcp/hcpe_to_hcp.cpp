@@ -20,14 +20,10 @@ int main(int argc, char *argv[])
 	}
 	const s64 entryNum = ifs.tellg() / sizeof(HuffmanCodedPosAndEval);
 	ifs.seekg(0);
+	std::cout << "input num = " << entryNum << std::endl;
 
-	if (entryNum > UINT_MAX) {
-		std::cerr << "Error: entryNum > UINT_MAX" << std::endl;
-		return 1;
-	}
-
-	HuffmanCodedPosAndEval *inhcpevec = new HuffmanCodedPosAndEval[entryNum];
-	ifs.read(reinterpret_cast<char*>(inhcpevec), sizeof(HuffmanCodedPosAndEval) * entryNum);
+	const s64 num_per_file = 1024 * 1024 * 1024 / sizeof(HuffmanCodedPosAndEval); // 1GB
+	HuffmanCodedPosAndEval *inhcpevec = new HuffmanCodedPosAndEval[num_per_file];
 
 	std::ofstream ofs(hcpFile, std::ios::binary);
 	if (!ofs) {
@@ -36,15 +32,22 @@ int main(int argc, char *argv[])
 	}
 
 	s64 outNum = 0;
-	for (s64 i = 0; i < entryNum; i++) {
-		HuffmanCodedPosAndEval& hcpe = inhcpevec[i];
+	s64 d = 0;
+	for (s64 i = 0; i < entryNum; i++, d++) {
+		if (i % num_per_file == 0) {
+			s64 num = num_per_file;
+			if (i >= num_per_file * (entryNum / num_per_file))
+				num = entryNum - num_per_file * (entryNum / num_per_file);
+			ifs.read(reinterpret_cast<char*>(inhcpevec), sizeof(HuffmanCodedPosAndEval) * num_per_file);
+			d = 0;
+		}
+		HuffmanCodedPosAndEval& hcpe = inhcpevec[d];
 		if (std::abs(hcpe.eval) < evalThreshold) {
 			ofs.write(reinterpret_cast<char*>(&hcpe.hcp), sizeof(HuffmanCodedPos));
 			outNum++;
 		}
 	}
 
-	std::cout << "input num = " << entryNum << std::endl;
 	std::cout << "output num = " << outNum << std::endl;
 
 	return 0;
