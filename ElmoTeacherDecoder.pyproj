@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>99ec7e4b-bd8a-4f07-bd6c-8a6fdae17406</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>test3.py</StartupFile>
+    <StartupFile>csa_to_hcp.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -13,7 +13,7 @@
     <Name>ElmoTeacherDecoder</Name>
     <RootNamespace>ElmoTeacherDecoder</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>H:\src\elmo_for_learn\bin\two</CommandLineArguments>
+    <CommandLineArguments>R:\t r:\hcp</CommandLineArguments>
     <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -25,6 +25,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="csa_to_hcp.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ElmoTeacherDecoder2.py" />
     <Compile Include="ElmoTeacherDecoder.py" />
     <Compile Include="hcp_unique.py">
