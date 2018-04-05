@@ -36,7 +36,7 @@ for file in fild_all_files(args.csa_dir):
         if turnEval == args.turn:
             m = ptn.search(line)
             if m:
-                if int(m.group(1)) > args.eval:
+                if abs(int(m.group(1))) > args.eval:
                     turnEval = turn
                 turn += 1
         s += line
