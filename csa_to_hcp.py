@@ -26,7 +26,7 @@ hcp = np.empty(100000000, dtype=HuffmanCodedPos)
 file_num = 0
 cnt = 0
 
-ptn = re.compile(r"^'\*\* (\d+)")
+ptn = re.compile(r"^'\*\* (-?\d+)")
 
 for file in fild_all_files(args.csa_dir):
     s = ""
