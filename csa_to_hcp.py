@@ -11,6 +11,7 @@ parser.add_argument('csa_dir')
 parser.add_argument('hcp_file')
 parser.add_argument('--turn', default=150, type=int)
 parser.add_argument('--eval', default=1000, type=int)
+parser.add_argument('--rate', type=int)
 args = parser.parse_args()
 
 HuffmanCodedPos = np.dtype([
@@ -26,22 +27,36 @@ hcp = np.empty(100000000, dtype=HuffmanCodedPos)
 file_num = 0
 cnt = 0
 
-ptn = re.compile(r"^'\*\* (-?\d+)")
+ptn_rate = re.compile(r"^'(black|white)_rate:.*:(.*)")
+ptn_eval = re.compile(r"^'\*\* (-?\d+)")
 
 for file in fild_all_files(args.csa_dir):
+    rate = {}
     s = ""
     turn = 0
     turnEval = args.turn
-    for line in open(file, 'r'):
-        if turnEval == args.turn:
-            m = ptn.search(line)
-            if m:
-                if abs(int(m.group(1))) > args.eval:
-                    turnEval = turn
-                turn += 1
-        s += line
+    try:
+        for line in open(file, 'r'):
+            if turn == 0:
+                m = ptn_rate.search(line)
+                if m:
+                    rate[m.group(1)] = float(m.group(2))
+
+            if turnEval == args.turn:
+                m = ptn_eval.search(line)
+                if m:
+                    if abs(int(m.group(1))) > args.eval:
+                        turnEval = turn
+                    turn += 1
+            s += line
+    except:
+        print(file)
+        continue
 
     if turn == 0:
+        continue
+
+    if args.rate is not None and (len(rate) < 2 or min(rate.values()) < args.rate):
         continue
 
     try:
