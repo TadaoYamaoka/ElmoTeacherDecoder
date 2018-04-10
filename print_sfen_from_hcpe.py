@@ -25,5 +25,4 @@ if args.num is None:
 else:
     len = args.num
 
-for i in range(len):
-    hcp_decoder.print_sfen_from_hcpe(hcpevec[0:len])
+hcp_decoder.print_sfen_from_hcpe(hcpevec[0:len])
