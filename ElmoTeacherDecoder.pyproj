@@ -34,6 +34,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="kif_to_hcp.py" />
+    <Compile Include="make_test_hcp.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="print_sfen_from_hcphe.py" />
     <Compile Include="print_sfen_from_hcpe.py" />
     <Compile Include="print_sfen_from_hcp.py">
