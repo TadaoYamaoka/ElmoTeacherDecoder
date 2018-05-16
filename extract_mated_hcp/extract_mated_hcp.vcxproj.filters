@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\elmo_for_learn">
+      <UniqueIdentifier>{932cf852-849f-488c-806f-cd9bccc21dca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="extract_mated_hcp.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\bitboard.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\hand.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\init.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\move.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\mt64bit.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\pieceScore.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\position.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\square.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\generateMoves.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="dfpn.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\hcp_decoder\bitboard.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\color.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\common.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\generateMoves.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\hand.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\ifdef.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\init.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\move.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\mt64bit.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\overloadEnumOperators.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\piece.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\pieceScore.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\position.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\score.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hcp_decoder\square.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
