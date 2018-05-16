@@ -37,6 +37,7 @@
     <Compile Include="make_test_hcp.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="divide_hcp.py" />
     <Compile Include="print_sfen_from_psv.py" />
     <Compile Include="print_sfen_from_hcphe.py" />
     <Compile Include="print_sfen_from_hcpe.py" />
