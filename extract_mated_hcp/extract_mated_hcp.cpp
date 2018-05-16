@@ -101,6 +101,8 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	auto start_time = std::chrono::system_clock::now();
+
 	Position pos;
 	s64 outNum = 0;
 	s64 outNumMated = 0;
@@ -131,6 +133,12 @@ int main(int argc, char *argv[])
 		else {
 			ofs.write(reinterpret_cast<char*>(&hcp), sizeof(HuffmanCodedPos));
 			outNum++;
+		}
+
+		if (i % 1000 == 1000 - 1) {
+			auto end_time = std::chrono::system_clock::now();
+			auto time_sec = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+			std::cout << "nomate=" << outNum << ", mate=" << outNumMated << ", elapse=" << time_sec << "[sec]" << std::endl;
 		}
 	}
 
