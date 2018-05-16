@@ -64,8 +64,9 @@ int main(int argc, char *argv[])
 	HuffmanCodedPos::init();
 	dfpn_init();
 
-	test1();
-	return 0;
+	//test1();
+	//test2();
+	//return 0;
 
 	if (argc < 3) {
 		std::cout << "extract_mated_hcp input_hcp not_mated_hcp mated_hcp" << std::endl;
@@ -114,7 +115,7 @@ int main(int argc, char *argv[])
 		}
 		HuffmanCodedPos& hcp = inhcpvec[d];
 		pos.set(hcp, nullptr);
-		cout << pos.toSFEN() << endl;
+		//cout << pos.toSFEN() << endl;
 		bool mated = false;
 		if (pos.inCheck()) {
 			mated = dfpn_andnode(pos);

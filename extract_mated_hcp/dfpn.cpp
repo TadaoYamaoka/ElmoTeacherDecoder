@@ -9,7 +9,7 @@ using namespace std;
 
 const int64_t HASH_SIZE_MB = 4096;
 const int MAX_PLY = 20;
-const int64_t MAX_SEARCH_NODE = 2097152;
+const int64_t MAX_SEARCH_NODE = 1048576;
 
 // --- ‹l‚İ«Šû’Tõ
 
