@@ -8,8 +8,8 @@
 using namespace std;
 
 const int64_t HASH_SIZE_MB = 4096;
-const int MAX_PLY = 20;
-const int64_t MAX_SEARCH_NODE = 1048576;
+const int MAX_PLY = 30;
+const int64_t MAX_SEARCH_NODE = 2097152;
 
 // --- 詰み将棋探索
 
@@ -95,6 +95,7 @@ private:
 // ただしSmallTreeGCは実装せず、Stockfishの置換表の実装を真似ている
 struct TranspositionTable {
 	static const constexpr uint32_t kInfiniteDepth = 1000000;
+	static const constexpr uint64_t or_node_mask = 3;
 	struct TTEntry {
 		// ハッシュの上位32ビット
 		uint32_t hash_high; // 0
@@ -122,7 +123,12 @@ struct TranspositionTable {
 	}
 
 	TTEntry& LookUp(const Key key, const Hand hand, bool or_node) {
-		auto& entries = tt[key & clusters_mask];
+		Key key_masked = key;
+		if (or_node)
+			key_masked |= or_node_mask;
+		else
+			key_masked &= ~or_node_mask;
+		auto& entries = tt[key_masked & clusters_mask];
 		uint32_t hash_high = key >> 32;
 		// 検索条件に合致するエントリを返す
 		for (size_t i = 0; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
@@ -149,34 +155,28 @@ struct TranspositionTable {
 						if (hash_high == entry_rest.hash_high) {
 							if (or_node && hand.isEqualOrSuperior(entry_rest.hand) || !or_node && entry_rest.hand.isEqualOrSuperior(hand)) {
 								if (entry_rest.pn == 0) {
+									if (entry.generation != generation)
+										entry.minimum_distance = kInfiniteDepth;
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
 							}
-							/*else if (or_node && entry_rest.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry_rest.hand)) {
-								if (entry_rest.dn == 0) {
-									entry_rest.generation = generation;
-									return entry_rest;
-								}
-							}*/
 						}
 					}
+					if (entry.generation != generation)
+						entry.minimum_distance = kInfiniteDepth;
 					entry.generation = generation;
 					return entry;
 				}
 				// 優越関係を満たす局面に証明済みの局面がある場合、それを返す
 				if (or_node && hand.isEqualOrSuperior(entry.hand) || !or_node && entry.hand.isEqualOrSuperior(hand)) {
 					if (entry.pn == 0) {
+						if (entry.generation != generation)
+							entry.minimum_distance = kInfiniteDepth;
 						entry.generation = generation;
 						return entry;
 					}
 				}
-				/*else if (or_node && entry.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry.hand)) {
-					if (entry.dn == 0) {
-						entry.generation = generation;
-						return entry;
-					}
-				}*/
 			}
 		}
 
@@ -519,6 +519,8 @@ bool dfpn_andnode(Position& r) {
 	int64_t searchedNode = 0;
 	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn, false, false, 0, searchedNode);
 	const auto& entry = transposition_table.LookUp(r, false);
+
+	//cout << searchedNode << endl;
 
 	return entry.pn == 0;
 }
