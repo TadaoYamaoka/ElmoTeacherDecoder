@@ -486,7 +486,7 @@ bool dfpn(Position& r) {
 		cout << move.toUSI() << " ";
 	cout << endl;*/
 
-	return entry.pn == 0 || entry.dn == 0;
+	return entry.pn == 0;
 }
 
 // 詰将棋探索のエントリポイント
@@ -502,5 +502,5 @@ bool dfpn_andnode(Position& r) {
 
 	//cout << searchedNode << endl;
 
-	return entry.pn == 0 || entry.dn == 0;
+	return entry.pn == 0;
 }
