@@ -95,28 +95,23 @@ private:
 // ただしSmallTreeGCは実装せず、Stockfishの置換表の実装を真似ている
 struct TranspositionTable {
 	static const constexpr uint32_t kInfiniteDepth = 1000000;
-	static const constexpr int CacheLineSize = 64;
 	struct TTEntry {
 		// ハッシュの上位32ビット
 		uint32_t hash_high; // 0
-							// TTEntryのインスタンスを作成したタイミングで先端ノードを表すよう1で初期化する
+		Hand hand; // 手駒
+		// TTEntryのインスタンスを作成したタイミングで先端ノードを表すよう1で初期化する
 		int pn; // 1
 		int dn; // 1
 		uint32_t generation : 8; // 0
-								 // ルートノードからの最短距離
-								 // 初期値を∞として全てのノードより最短距離が長いとみなす
+		// ルートノードからの最短距離
+		// 初期値を∞として全てのノードより最短距離が長いとみなす
 		int minimum_distance : 24; // UINT_MAX
-								   // TODO(nodchip): 指し手が1手しかない場合の手を追加する
 		int num_searched; // 0
 	};
-	static_assert(sizeof(TTEntry) == 20, "");
 
 	struct Cluster {
-		TTEntry entries[3];
-		int padding;
+		TTEntry entries[256];
 	};
-	static_assert(sizeof(Cluster) == 64, "");
-	static_assert(CacheLineSize % sizeof(Cluster) == 0, "");
 
 	virtual ~TranspositionTable() {
 		if (tt_raw) {
@@ -126,14 +121,16 @@ struct TranspositionTable {
 		}
 	}
 
-	TTEntry& LookUp(Key key) {
+	TTEntry& LookUp(const Key key, const Hand hand, bool or_node) {
 		auto& entries = tt[key & clusters_mask];
 		uint32_t hash_high = key >> 32;
 		// 検索条件に合致するエントリを返す
-		for (auto& entry : entries.entries) {
+		for (size_t i = 0; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
+			TTEntry& entry = entries.entries[i];
 			if (entry.hash_high == 0) {
 				// 空のエントリが見つかった場合
 				entry.hash_high = hash_high;
+				entry.hand = hand;
 				entry.pn = 1;
 				entry.dn = 1;
 				entry.generation = generation;
@@ -143,12 +140,47 @@ struct TranspositionTable {
 			}
 
 			if (hash_high == entry.hash_high) {
-				// keyが合致するエントリを見つけた場合
-				entry.generation = generation;
-				return entry;
+				if (hand == entry.hand) {
+					// keyが合致するエントリを見つけた場合
+					// 残りのエントリに優越関係を満たす局面があり証明済みの場合、それを返す
+					for (i++; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
+						TTEntry& entry_rest = entries.entries[i];
+						if (entry_rest.hash_high == 0) break;
+						if (hash_high == entry_rest.hash_high) {
+							if (or_node && hand.isEqualOrSuperior(entry_rest.hand) || !or_node && entry_rest.hand.isEqualOrSuperior(hand)) {
+								if (entry_rest.pn == 0) {
+									entry_rest.generation = generation;
+									return entry_rest;
+								}
+							}
+							/*else if (or_node && entry_rest.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry_rest.hand)) {
+								if (entry_rest.dn == 0) {
+									entry_rest.generation = generation;
+									return entry_rest;
+								}
+							}*/
+						}
+					}
+					entry.generation = generation;
+					return entry;
+				}
+				// 優越関係を満たす局面に証明済みの局面がある場合、それを返す
+				if (or_node && hand.isEqualOrSuperior(entry.hand) || !or_node && entry.hand.isEqualOrSuperior(hand)) {
+					if (entry.pn == 0) {
+						entry.generation = generation;
+						return entry;
+					}
+				}
+				/*else if (or_node && entry.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry.hand)) {
+					if (entry.dn == 0) {
+						entry.generation = generation;
+						return entry;
+					}
+				}*/
 			}
 		}
 
+		//cout << "hash entry full" << endl;
 		// 合致するエントリが見つからなかったので
 		// 世代が一番古いエントリをつぶす
 		TTEntry* best_entry = nullptr;
@@ -168,6 +200,7 @@ struct TranspositionTable {
 			}
 		}
 		best_entry->hash_high = hash_high;
+		best_entry->hand = hand;
 		best_entry->pn = 1;
 		best_entry->dn = 1;
 		best_entry->generation = generation;
@@ -176,13 +209,13 @@ struct TranspositionTable {
 		return *best_entry;
 	}
 
-	TTEntry& LookUp(Position& n) {
-		return LookUp(n.getKey());
+	TTEntry& LookUp(const Position& n, bool or_node) {
+		return LookUp(n.getBoardKey(), n.hand(n.turn()), or_node);
 	}
 
 	// moveを指した後の子ノードの置換表エントリを返す
-	TTEntry& LookUpChildEntry(Position& n, Move move) {
-		return LookUp(n.getKeyAfter(move));
+	TTEntry& LookUpChildEntry(Position& n, Move move, bool or_node) {
+		return LookUp(n.getBoardKeyAfter(move), n.hand(oppositeColor(n.turn())), !or_node);
 	}
 
 	void Resize() {
@@ -226,7 +259,7 @@ static const constexpr int kMaxDepth = MAX_PLY;
 TranspositionTable transposition_table;
 
 void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, int depth, int64_t& searchedNode) {
-	auto& entry = transposition_table.LookUp(n);
+	auto& entry = transposition_table.LookUp(n, or_node);
 
 	if (depth > kMaxDepth) {
 		entry.pn = kInfinitePnDn;
@@ -282,7 +315,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 		for (const auto& move : move_picker) {
 			// unproven old childの定義はminimum distanceがこのノードよりも小さいノードだと理解しているのだけど、
 			// 合っているか自信ない
-			const auto& child_entry = transposition_table.LookUpChildEntry(n, move);
+			const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node);
 			if (entry.minimum_distance > child_entry.minimum_distance &&
 				child_entry.pn != kInfinitePnDn &&
 				child_entry.dn != kInfinitePnDn) {
@@ -296,7 +329,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 			entry.pn = kInfinitePnDn;
 			entry.dn = 0;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move);
+				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node);
 				entry.pn = std::min(entry.pn, child_entry.pn);
 				entry.dn += child_entry.dn;
 			}
@@ -306,7 +339,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 			entry.pn = 0;
 			entry.dn = kInfinitePnDn;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move);
+				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node);
 				entry.pn += child_entry.pn;
 				entry.dn = std::min(entry.dn, child_entry.dn);
 			}
@@ -352,7 +385,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 			int best_dn = 0;
 			int best_num_search = INT_MAX;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move);
+				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node);
 				if (child_entry.pn < best_pn ||
 					child_entry.pn == best_pn && best_num_search > child_entry.num_searched) {
 					second_best_pn = best_pn;
@@ -376,7 +409,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 			int best_pn = 0;
 			int best_num_search = INT_MAX;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move);
+				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node);
 				if (child_entry.dn < best_dn ||
 					child_entry.dn == best_dn && best_num_search > child_entry.num_searched) {
 					second_best_dn = best_dn;
@@ -429,7 +462,7 @@ bool dfs(bool or_node, Position& pos, std::vector<Move>& moves, std::unordered_s
 	}
 
 	for (const auto& move : move_picker) {
-		const auto& child_entry = transposition_table.LookUpChildEntry(pos, move);
+		const auto& child_entry = transposition_table.LookUpChildEntry(pos, move, or_node);
 		if (child_entry.pn != 0) {
 			continue;
 		}
@@ -462,9 +495,16 @@ bool dfpn(Position& r) {
 
 	int64_t searchedNode = 0;
 	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn, false, true, 0, searchedNode);
-	const auto& entry = transposition_table.LookUp(r);
+	const auto& entry = transposition_table.LookUp(r, true);
 
 	//cout << searchedNode << endl;
+
+	/*std::vector<Move> moves;
+	std::unordered_set<Key> visited;
+	dfs(true, r, moves, visited);
+	for (Move& move : moves)
+		cout << move.toUSI() << " ";
+	cout << endl;*/
 
 	return entry.pn == 0;
 }
@@ -478,7 +518,7 @@ bool dfpn_andnode(Position& r) {
 
 	int64_t searchedNode = 0;
 	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn, false, false, 0, searchedNode);
-	const auto& entry = transposition_table.LookUp(r);
+	const auto& entry = transposition_table.LookUp(r, false);
 
 	return entry.pn == 0;
 }

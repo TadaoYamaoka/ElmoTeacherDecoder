@@ -24,11 +24,21 @@ void test1()
 	pos.undoMove(move);*/
 
 	pos.set("1n1g3+Pl/k1p1s4/1ng5p/pSP1p1pp1/1n3p3/P1K3P1P/1P7/9/L1G5L b 2R2BG2SL5Pn 161", nullptr); // mate 15
+	//pos.set("l7K/9/p6sp/1g1ppRpbk/7n1/1P2SP2P/P3P1P2/2+n1s2+p1/LN2+r2NL b B3GSL6P 1", nullptr); // mate 10
+	//pos.set("1n3G1nK/5+r1R1/p2L+P3p/2p2Gp2/9/3P2B2/P1P5+n/5S1p1/L1S1L1Ggk b 2SNL6Pb3p 1", nullptr); // mate 7
+	//pos.set("ln3+P1+PK/1r1k3+B1/3p1+L1+S1/p1p2p1+B1/3+r3s1/7s1/4p1+n+pp/+p3+n2p+p/1+p3+p+p+p+p b 2GN2L2gsp 1", nullptr); // mate 15
+	//pos.set("lR6K/4p2+P1/1p7/p7p/2k1+b2p1/Pg1n+n3P/N5+s2/1L1P5/L4+R2L b B2G2S3Pgsn6p 1", nullptr); // mate 15
+	//pos.set("lnp1+RS2K/1k5+P1/1pgps3p/4p4/6+Rp1/3+n5/+pP2n1P2/2+b1P4/8+p b B2G2SN2L2Pgl4p 1", nullptr); // mate 23
 	//pos.set("lns3kn1/1r4g2/3Bp1s+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l b G2Pl4p 53", nullptr); // mate 1
 	//pos.set("lns3kn1/1r3g3/3Bp1s+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l b G3Pl3p 51", nullptr); // mate 3
 	//pos.set("lns3kn1/1r7/4pgs+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l b BG3Pl3p 49", nullptr); // •s‹l‚Ý
 	//pos.set("lns4n1/1r3k3/4pgsg1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG2R1/LN1K3N+l b B3Pl3p 47", nullptr); // •s‹l‚Ý
 	//pos.set("7nl/5Psk1/1+P1+P1p1pp/K3g4/6p1B/1SP4P1/PsS3P1P/1N7/+r6NL w GLrb2gnl6p 1", nullptr); // •s‹l‚Ý
+	//pos.set("ln3+P1+PK/1rk4+B1/3p1+L1+S1/p1p2p1+B1/3+r3s1/7s1/4p1+n+pp/+p3+n2p+p/1+p3+p+p+p+p b 2GN2L2gsp 1", nullptr); // •s‹l‚Ý
+	//pos.set("l2+S1p2K/1B4G2/p4+N1p1/3+B3sk/5P1s1/P1G3p1p/2P1Pr1+n1/9/LNS5L b R2GL8Pnp 1", nullptr); // •s‹l‚Ý
+	//pos.set("+B2B1n2K/7+R1/p2p1p1ps/3g2+r1k/1p3n3/4n1P+s1/PP7/1S6p/L7L b 3GS7Pn2l2p 1", nullptr); // •s‹l‚Ý
+	//pos.set("l6GK/2p2+R1P1/p1nsp2+Sp/1p1p2s2/2+R2bk2/3P4P/P4+p1g1/2s6/L7L b B2GNL2n7p 1", nullptr); // •s‹l‚Ý
+	//pos.set("1n3G1nK/2+r2P3/p3+P1n1p/2p2Gp2/5l3/3P5/P1P3S2/6+Bpg/L1S1L3k b R2SNL5Pbg3p 1", nullptr); // •s‹l‚Ý
 
 	auto start = std::chrono::system_clock::now();
 	bool ret = dfpn(pos);
@@ -57,6 +67,20 @@ void test2()
 	cout << time_ms << "ms" << endl;
 }
 
+void test3()
+{
+	Position pos;
+
+	pos.set("lns3kn1/1r3g3/3Bp1s+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l b G3Pl3p 51", nullptr);
+	Move move = makeCaptureMove(PieceType::Dragon, SQ23, SQ21, pos);
+	cout << move.toUSI() << ":" << pos.getBoardKeyAfter(move) << "," << pos.hand(oppositeColor(pos.turn())).value() << endl;
+
+	StateInfo state_info;
+	pos.doMove(move, state_info);
+	cout << move.toUSI() << ":" << pos.getBoardKey() << "," << pos.hand(pos.turn()).value() << endl;
+	pos.undoMove(move);
+}
+
 int main(int argc, char *argv[])
 {
 	initTable();
@@ -66,6 +90,7 @@ int main(int argc, char *argv[])
 
 	//test1();
 	//test2();
+	//test3();
 	//return 0;
 
 	if (argc < 3) {
@@ -117,7 +142,9 @@ int main(int argc, char *argv[])
 		}
 		HuffmanCodedPos& hcp = inhcpvec[d];
 		pos.set(hcp, nullptr);
+
 		//cout << pos.toSFEN() << endl;
+		//auto start = std::chrono::system_clock::now();
 		bool mated = false;
 		if (pos.inCheck()) {
 			mated = dfpn_andnode(pos);
@@ -125,6 +152,8 @@ int main(int argc, char *argv[])
 		else {
 			mated = dfpn(pos);
 		}
+		//auto end = std::chrono::system_clock::now();
+		//cout << mated << " " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << endl;
 
 		if (mated) {
 			ofsMated.write(reinterpret_cast<char*>(&hcp), sizeof(HuffmanCodedPos));
