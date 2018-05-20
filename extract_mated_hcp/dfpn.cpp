@@ -8,7 +8,7 @@
 using namespace std;
 
 const int64_t HASH_SIZE_MB = 4096;
-const int MAX_PLY = 30;
+const int MAX_PLY = 25;
 const int64_t MAX_SEARCH_NODE = 2097152;
 
 // --- ‹l‚İ«Šû’Tõ
@@ -155,8 +155,6 @@ struct TranspositionTable {
 							}
 						}
 					}
-					if (entry.generation != generation)
-						entry.minimum_distance = kInfiniteDepth;
 					entry.generation = generation;
 					return entry;
 				}
