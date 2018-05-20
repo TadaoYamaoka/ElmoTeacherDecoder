@@ -95,7 +95,6 @@ private:
 // ただしSmallTreeGCは実装せず、Stockfishの置換表の実装を真似ている
 struct TranspositionTable {
 	static const constexpr uint32_t kInfiniteDepth = 1000000;
-	static const constexpr uint64_t or_node_mask = 3;
 	struct TTEntry {
 		// ハッシュの上位32ビット
 		uint32_t hash_high; // 0
@@ -123,17 +122,12 @@ struct TranspositionTable {
 	}
 
 	TTEntry& LookUp(const Key key, const Hand hand, bool or_node) {
-		Key key_masked = key;
-		if (or_node)
-			key_masked |= or_node_mask;
-		else
-			key_masked &= ~or_node_mask;
-		auto& entries = tt[key_masked & clusters_mask];
+		auto& entries = tt[key & clusters_mask];
 		uint32_t hash_high = key >> 32;
 		// 検索条件に合致するエントリを返す
 		for (size_t i = 0; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
 			TTEntry& entry = entries.entries[i];
-			if (entry.hash_high == 0) {
+			if (entry.hash_high == 0 || generation != entry.generation) {
 				// 空のエントリが見つかった場合
 				entry.hash_high = hash_high;
 				entry.hand = hand;
@@ -145,18 +139,16 @@ struct TranspositionTable {
 				return entry;
 			}
 
-			if (hash_high == entry.hash_high) {
+			if (hash_high == entry.hash_high && generation == entry.generation) {
 				if (hand == entry.hand) {
 					// keyが合致するエントリを見つけた場合
 					// 残りのエントリに優越関係を満たす局面があり証明済みの場合、それを返す
 					for (i++; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
 						TTEntry& entry_rest = entries.entries[i];
 						if (entry_rest.hash_high == 0) break;
-						if (hash_high == entry_rest.hash_high) {
+						if (hash_high == entry_rest.hash_high && generation == entry_rest.generation) {
 							if (or_node && hand.isEqualOrSuperior(entry_rest.hand) || !or_node && entry_rest.hand.isEqualOrSuperior(hand)) {
 								if (entry_rest.pn == 0) {
-									if (entry.generation != generation)
-										entry.minimum_distance = kInfiniteDepth;
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
@@ -171,8 +163,6 @@ struct TranspositionTable {
 				// 優越関係を満たす局面に証明済みの局面がある場合、それを返す
 				if (or_node && hand.isEqualOrSuperior(entry.hand) || !or_node && entry.hand.isEqualOrSuperior(hand)) {
 					if (entry.pn == 0) {
-						if (entry.generation != generation)
-							entry.minimum_distance = kInfiniteDepth;
 						entry.generation = generation;
 						return entry;
 					}
@@ -182,21 +172,13 @@ struct TranspositionTable {
 
 		//cout << "hash entry full" << endl;
 		// 合致するエントリが見つからなかったので
-		// 世代が一番古いエントリをつぶす
+		// 古いエントリをつぶす
 		TTEntry* best_entry = nullptr;
-		uint32_t best_generation = UINT_MAX;
+		uint32_t best_num_searched = UINT_MAX;
 		for (auto& entry : entries.entries) {
-			uint32_t temp_generation;
-			if (generation < entry.generation) {
-				temp_generation = 256 - entry.generation + generation;
-			}
-			else {
-				temp_generation = generation - entry.generation;
-			}
-
-			if (best_generation > temp_generation) {
+			if (best_num_searched > entry.num_searched) {
 				best_entry = &entry;
-				best_generation = temp_generation;
+				best_num_searched = entry.num_searched;
 			}
 		}
 		best_entry->hash_high = hash_high;
@@ -506,7 +488,7 @@ bool dfpn(Position& r) {
 		cout << move.toUSI() << " ";
 	cout << endl;*/
 
-	return entry.pn == 0;
+	return entry.pn == 0 || entry.dn == 0;
 }
 
 // 詰将棋探索のエントリポイント
@@ -522,5 +504,5 @@ bool dfpn_andnode(Position& r) {
 
 	//cout << searchedNode << endl;
 
-	return entry.pn == 0;
+	return entry.pn == 0 || entry.dn == 0;
 }

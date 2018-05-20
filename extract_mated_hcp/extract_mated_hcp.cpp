@@ -23,7 +23,7 @@ void test1()
 	cout << move.toUSI() << ":" << pos.getKey() << endl;
 	pos.undoMove(move);*/
 
-	//pos.set("1n1g3+Pl/k1p1s4/1ng5p/pSP1p1pp1/1n3p3/P1K3P1P/1P7/9/L1G5L b 2R2BG2SL5Pn 161", nullptr); // mate 15
+	pos.set("1n1g3+Pl/k1p1s4/1ng5p/pSP1p1pp1/1n3p3/P1K3P1P/1P7/9/L1G5L b 2R2BG2SL5Pn 161", nullptr); // mate 15
 	//pos.set("ln6K/9/1sp2+P3/pp4G1p/6P2/+rl+B+R5/k8/+b8/9 b 2G2SNL2Pgs2nl10p 1", nullptr); // mate 15
 	//pos.set("ln1s+R3K/2s6/p1pp1p3/kp+r4pp/N3p4/1Sg6/P2B2P1P/5g3/LL3g1NL b BGS2Pn5p 1", nullptr); // mate 17
 	//pos.set("n1gg2+R2/l2l5/p1k1p3K/1ppp5/3PBp3/9/P4P2P/g8/8L b RG2S2NL6Pb2sn2p 1", nullptr); // mate 33
@@ -35,7 +35,7 @@ void test1()
 	//pos.set("l6n1/b+R4glK/n4s1p1/p5kl1/2sp2n2/P1p1P3P/1P3P3/2P1G4/2+b6 b R2G2SNL7Pp 1", nullptr); // mate 15
 	//pos.set("7+L1/1+B1nkg2+R/3p2s1K/1pp1g1p2/1n1P5/lSP4P1/1P7/1G7/1+l7 b RBG2S2NL9Pp 1", nullptr); // mate 11
 	//pos.set("ln6K/9/1sp2+P3/pp4G1p/6P2/+r8/9/9/k+l1+R5 b B2G2SNLPbgs2nl11p 1", nullptr); // mate 13
-	pos.set("lnS1r4/GGs5K/2k5p/pppp5/9/PLPP5/1P+n1PS2P/4G4/g1+r3+p2 b BS2N2L6Pb 1", nullptr); // mate 15
+	//pos.set("lnS1r4/GGs5K/2k5p/pppp5/9/PLPP5/1P+n1PS2P/4G4/g1+r3+p2 b BS2N2L6Pb 1", nullptr); // mate 15
 	//pos.set("7s1/k2g5/n1p1p1P+LK/s2P2n2/p5pP1/2P1P4/5+p3/8L/L3+b1sN1 w NL4P2rb3gs4p 1", nullptr); // mate 13
 	//pos.set("l7K/9/p6sp/1g1ppRpbk/7n1/1P2SP2P/P3P1P2/2+n1s2+p1/LN2+r2NL b B3GSL6P 1", nullptr); // mate 10
 	//pos.set("1n3G1nK/5+r1R1/p2L+P3p/2p2Gp2/9/3P2B2/P1P5+n/5S1p1/L1S1L1Ggk b 2SNL6Pb3p 1", nullptr); // mate 7
@@ -70,7 +70,10 @@ void test2()
 	// Ž©‹Ê‚Ì‹l‚Ý
 	//pos.set("lns3kn1/1r3gP2/3Bp1s+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l w G2Pl3p 52", nullptr); // mate 2
 	//pos.set("l2Rp1k1l/6g2/2n+R1p1p1/p5P2/2+bpPP3/6G1K/PPPPsS1P1/9/LN2b3L b GS2NPgs4p 1", nullptr); // mate 10
-	pos.set("ln6K/1ksPg1s+bG/5s2p/ppp3p2/9/P1P3P2/4+p3P/1+r7/LN3L2L b RSb2g2n7p 1", nullptr); // mate 20
+	//pos.set("ln6K/1ksPg1s+bG/5s2p/ppp3p2/9/P1P3P2/4+p3P/1+r7/LN3L2L b RSb2g2n7p 1", nullptr); // mate 20
+	pos.set("l+R3g3/3+P1g2k/2+Bppp1+Bn/p1s2sspK/9/P1P+RS1pPg/3P2+n2/2+n2P+n2/L6L1 w GL5Pp 1", nullptr); // •s‹l‚ÝiŒãŽèmate 1j
+	//pos.set("l3B3k/1r7/p1n2s1G1/1p1n5/7pK/P1P2pSgr/9/6G2/L2+s5 b GSNLbnl12p 1", nullptr); // mate 10
+	//pos.set("2+R5l/6gk1/2s1p2+Pn/2pp1pP1K/6n2/1P1P4P/4Ps3/4R4/8L w 2B2G2S2N8Pg2l 1", nullptr); // •s‹l‚Ý
 	//pos.set("lns1S2nl/1r3kg2/4pgsp1/2pp1p2P/pp2P1b2/2P2P1P1/PPSP5/2GBG2R1/LN1K3NL w 2Pp 1", nullptr); // •s‹l‚Ý
 	auto start = std::chrono::system_clock::now();
 	bool ret = dfpn_andnode(pos);
