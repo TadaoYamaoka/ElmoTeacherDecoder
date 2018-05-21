@@ -141,14 +141,14 @@ struct TranspositionTable {
 				return entry;
 			}
 
-			if (hash_high == entry.hash_high && depth == entry.depth && generation == entry.generation) {
-				if (hand == entry.hand) {
+			if (hash_high == entry.hash_high && generation == entry.generation) {
+				if (hand == entry.hand && depth == entry.depth) {
 					// key‚ª‡’v‚·‚éƒGƒ“ƒgƒŠ‚ğŒ©‚Â‚¯‚½ê‡
 					// c‚è‚ÌƒGƒ“ƒgƒŠ‚É—D‰zŠÖŒW‚ğ–‚½‚·‹Ç–Ê‚ª‚ ‚èØ–¾Ï‚İ‚Ìê‡A‚»‚ê‚ğ•Ô‚·
 					for (i++; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
 						TTEntry& entry_rest = entries.entries[i];
 						if (entry_rest.hash_high == 0) break;
-						if (hash_high == entry_rest.hash_high && depth == entry_rest.depth && generation == entry_rest.generation) {
+						if (hash_high == entry_rest.hash_high && generation == entry_rest.generation) {
 							if (or_node && hand.isEqualOrSuperior(entry_rest.hand) || !or_node && entry_rest.hand.isEqualOrSuperior(hand)) {
 								if (entry_rest.pn == 0) {
 									entry_rest.generation = generation;
