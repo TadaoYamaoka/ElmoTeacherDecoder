@@ -103,10 +103,10 @@ struct TranspositionTable {
 		// TTEntryのインスタンスを作成したタイミングで先端ノードを表すよう1で初期化する
 		int pn; // 1
 		int dn; // 1
-		uint32_t generation : 8; // 0
+		uint32_t generation/* : 8*/; // 0
 		// ルートノードからの最短距離
 		// 初期値を∞として全てのノードより最短距離が長いとみなす
-		int minimum_distance : 24; // UINT_MAX
+		//int minimum_distance : 24; // UINT_MAX
 		int num_searched; // 0
 	};
 
@@ -136,7 +136,7 @@ struct TranspositionTable {
 				entry.pn = 1;
 				entry.dn = 1;
 				entry.generation = generation;
-				entry.minimum_distance = kInfiniteDepth;
+				//entry.minimum_distance = kInfiniteDepth;
 				entry.num_searched = 0;
 				return entry;
 			}
@@ -155,6 +155,12 @@ struct TranspositionTable {
 									return entry_rest;
 								}
 							}
+							/*else if (or_node && entry_rest.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry_rest.hand)) {
+								if (entry_rest.dn == 0 && entry_rest.depth <= MAX_PLY) {
+									entry_rest.generation = generation;
+									return entry_rest;
+								}
+							}*/
 						}
 					}
 					entry.generation = generation;
@@ -167,6 +173,12 @@ struct TranspositionTable {
 						return entry;
 					}
 				}
+				/*else if (or_node && entry.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry.hand)) {
+					if (entry.dn == 0 && entry.depth <= MAX_PLY) {
+						entry.generation = generation;
+						return entry;
+					}
+				}*/
 			}
 		}
 
@@ -187,7 +199,7 @@ struct TranspositionTable {
 		best_entry->pn = 1;
 		best_entry->dn = 1;
 		best_entry->generation = generation;
-		best_entry->minimum_distance = kInfiniteDepth;
+		//best_entry->minimum_distance = kInfiniteDepth;
 		best_entry->num_searched = 0;
 		return *best_entry;
 	}
@@ -241,13 +253,13 @@ static const constexpr int kMaxDepth = MAX_PLY;
 
 TranspositionTable transposition_table;
 
-void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, int depth, int64_t& searchedNode) {
+void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_node, int depth, int64_t& searchedNode) {
 	auto& entry = transposition_table.LookUp(n, or_node, depth);
 
 	if (depth > kMaxDepth) {
 		entry.pn = kInfinitePnDn;
 		entry.dn = 0;
-		entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 		return;
 	}
 
@@ -257,7 +269,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 	if (or_node && !n.inCheck() && n.mateMoveIn1Ply()) {
 		entry.pn = 0;
 		entry.dn = kInfinitePnDn;
-		entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 		return;
 	}
 
@@ -276,13 +288,13 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 			entry.dn = kInfinitePnDn;
 		}
 
-		entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 		return;
 	}
 
 	// minimum distanceを保存する
 	// TODO(nodchip): このタイミングでminimum distanceを保存するのが正しいか確かめる
-	entry.minimum_distance = std::min(entry.minimum_distance, depth);
+	//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 
 	bool first_time = true;
 	while (searchedNode < MAX_SEARCH_NODE) {
@@ -290,12 +302,12 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 
 		// determine whether thpn and thdn are increased.
 		// if (n is a leaf) inc flag = false;
-		if (entry.pn == 1 && entry.dn == 1) {
+		/*if (entry.pn == 1 && entry.dn == 1) {
 			inc_flag = false;
-		}
+		}*/
 
 		// if (n has an unproven old child) inc flag = true;
-		for (const auto& move : move_picker) {
+		/*for (const auto& move : move_picker) {
 			// unproven old childの定義はminimum distanceがこのノードよりも小さいノードだと理解しているのだけど、
 			// 合っているか自信ない
 			const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
@@ -305,7 +317,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 				inc_flag = true;
 				break;
 			}
-		}
+		}*/
 
 		// expand and compute pn(n) and dn(n);
 		if (or_node) {
@@ -334,12 +346,12 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 		//   thpn = max(thpn, pn(n) + 1);
 		//   thdn = max(thdn, dn(n) + 1);
 		// }
-		if (first_time && inc_flag) {
+		/*if (first_time && inc_flag) {
 			thpn = std::max(thpn, entry.pn + 1);
 			thpn = std::min(thpn, kInfinitePnDn);
 			thdn = std::max(thdn, entry.dn + 1);
 			thdn = std::min(thdn, kInfinitePnDn);
-		}
+		}*/
 
 		// if (pn(n) ? thpn || dn(n) ? thdn)
 		//   break; // termination condition is satisfied
@@ -412,7 +424,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn, bool inc_flag, bool or_node, i
 		StateInfo state_info;
 		n.doMove(best_move, state_info);
 		++searchedNode;
-		DFPNwithTCA(n, thpn_child, thdn_child, inc_flag, !or_node, depth + 1, searchedNode);
+		DFPNwithTCA(n, thpn_child, thdn_child/*, inc_flag*/, !or_node, depth + 1, searchedNode);
 		n.undoMove(best_move);
 	}
 }
@@ -477,7 +489,7 @@ bool dfpn(Position& r) {
 	transposition_table.NewSearch();
 
 	int64_t searchedNode = 0;
-	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn, false, true, 0, searchedNode);
+	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn/*, false*/, true, 0, searchedNode);
 	const auto& entry = transposition_table.LookUp(r, true, 0);
 
 	//cout << searchedNode << endl;
@@ -500,7 +512,7 @@ bool dfpn_andnode(Position& r) {
 	transposition_table.NewSearch();
 
 	int64_t searchedNode = 0;
-	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn, false, false, 0, searchedNode);
+	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn/*, false*/, false, 0, searchedNode);
 	const auto& entry = transposition_table.LookUp(r, false, 0);
 
 	//cout << searchedNode << endl;
