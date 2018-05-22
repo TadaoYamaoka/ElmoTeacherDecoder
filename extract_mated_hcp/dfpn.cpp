@@ -147,7 +147,7 @@ struct TranspositionTable {
 					// 残りのエントリに優越関係を満たす局面があり証明済みの場合、それを返す
 					for (i++; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
 						TTEntry& entry_rest = entries.entries[i];
-						if (entry_rest.hash_high == 0) break;
+						if (entry_rest.hash_high == 0 || generation != entry.generation) break;
 						if (hash_high == entry_rest.hash_high && generation == entry_rest.generation) {
 							if (or_node && hand.isEqualOrSuperior(entry_rest.hand) || !or_node && entry_rest.hand.isEqualOrSuperior(hand)) {
 								if (entry_rest.pn == 0) {
