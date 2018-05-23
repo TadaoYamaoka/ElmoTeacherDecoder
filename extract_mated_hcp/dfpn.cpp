@@ -68,7 +68,7 @@ public:
 			if (pos.inCheck()) {
 				// ©‹Ê‚ª‰¤è‚Ìê‡A“¦‚°‚éè‚©‚Â‰¤è‚ğ‚©‚¯‚éè‚ğ¶¬
 				last_ = std::remove_if(moveList_, last_, [&pos](const auto& move) {
-					return !pos.moveIsPseudoLegal(move);
+					return !pos.pseudoLegalMoveIsEvasion(move, pos.pinnedBB());
 				});
 			}
 		}
