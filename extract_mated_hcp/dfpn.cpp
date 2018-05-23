@@ -147,7 +147,7 @@ struct TranspositionTable {
 					// c‚è‚ÌƒGƒ“ƒgƒŠ‚É—D‰zŠÖŒW‚ğ–‚½‚·‹Ç–Ê‚ª‚ ‚èØ–¾Ï‚İ‚Ìê‡A‚»‚ê‚ğ•Ô‚·
 					for (i++; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
 						TTEntry& entry_rest = entries.entries[i];
-						if (entry_rest.hash_high == 0 || generation != entry.generation) break;
+						if (entry_rest.hash_high == 0) break;
 						if (hash_high == entry_rest.hash_high) {
 							if (or_node && hand.isEqualOrSuperior(entry_rest.hand) || !or_node && entry_rest.hand.isEqualOrSuperior(hand)) {
 								if (entry_rest.pn == 0) {
@@ -188,7 +188,7 @@ struct TranspositionTable {
 		TTEntry* best_entry = nullptr;
 		uint32_t best_num_searched = UINT_MAX;
 		for (auto& entry : entries.entries) {
-			if (best_num_searched > entry.num_searched) {
+			if (best_num_searched > entry.num_searched && entry.pn != 0) {
 				best_entry = &entry;
 				best_num_searched = entry.num_searched;
 			}
