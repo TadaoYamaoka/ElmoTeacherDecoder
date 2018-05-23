@@ -156,7 +156,7 @@ struct TranspositionTable {
 								}
 							}
 							/*else if (or_node && entry_rest.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry_rest.hand)) {
-								if (entry_rest.dn == 0 && entry_rest.depth <= MAX_PLY) {
+								if (entry_rest.dn == 0 && entry_rest.depth <= depth) {
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
@@ -174,7 +174,7 @@ struct TranspositionTable {
 					}
 				}
 				/*else if (or_node && entry.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry.hand)) {
-					if (entry.dn == 0 && entry.depth <= MAX_PLY) {
+					if (entry.dn == 0 && entry.depth <= depth) {
 						entry.generation = generation;
 						return entry;
 					}

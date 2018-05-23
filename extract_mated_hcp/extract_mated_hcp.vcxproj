@@ -156,6 +156,7 @@
     <ClCompile Include="..\hcp_decoder\square.cpp" />
     <ClCompile Include="dfpn.cpp" />
     <ClCompile Include="extract_mated_hcp.cpp" />
+    <ClCompile Include="mate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hcp_decoder\bitboard.hpp" />

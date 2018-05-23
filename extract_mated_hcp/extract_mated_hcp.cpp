@@ -2,6 +2,8 @@
 #include "position.hpp"
 #include "move.hpp"
 
+#include "mate.h"
+
 #include <iostream>
 
 using namespace std;
@@ -37,7 +39,7 @@ void test1()
 	//pos.set("ln6K/9/1sp2+P3/pp4G1p/6P2/+r8/9/9/k+l1+R5 b B2G2SNLPbgs2nl11p 1", nullptr); // mate 13
 	//pos.set("lnS1r4/GGs5K/2k5p/pppp5/9/PLPP5/1P+n1PS2P/4G4/g1+r3+p2 b BS2N2L6Pb 1", nullptr); // mate 15
 	//pos.set("7s1/k2g5/n1p1p1P+LK/s2P2n2/p5pP1/2P1P4/5+p3/8L/L3+b1sN1 w NL4P2rb3gs4p 1", nullptr); // mate 13
-	//pos.set("l7K/9/p6sp/1g1ppRpbk/7n1/1P2SP2P/P3P1P2/2+n1s2+p1/LN2+r2NL b B3GSL6P 1", nullptr); // mate 10
+	//pos.set("l7K/9/p6sp/1g1ppRpbk/7n1/1P2SP2P/P3P1P2/2+n1s2+p1/LN2+r2NL b B3GSL6P 1", nullptr); // mate 9
 	//pos.set("1n3G1nK/5+r1R1/p2L+P3p/2p2Gp2/9/3P2B2/P1P5+n/5S1p1/L1S1L1Ggk b 2SNL6Pb3p 1", nullptr); // mate 7
 	//pos.set("ln3+P1+PK/1r1k3+B1/3p1+L1+S1/p1p2p1+B1/3+r3s1/7s1/4p1+n+pp/+p3+n2p+p/1+p3+p+p+p+p b 2GN2L2gsp 1", nullptr); // mate 15
 	//pos.set("lR6K/4p2+P1/1p7/p7p/2k1+b2p1/Pg1n+n3P/N5+s2/1L1P5/L4+R2L b B2G2S3Pgsn6p 1", nullptr); // mate 15
@@ -59,6 +61,7 @@ void test1()
 
 	auto start = std::chrono::system_clock::now();
 	bool ret = dfpn(pos);
+	//bool ret = mateMoveInOddPly(pos, 11);
 	auto end = std::chrono::system_clock::now();
 
 	auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -75,12 +78,16 @@ void test2()
 	//pos.set("lns3kn1/1r3gP2/3Bp1s+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l w G2Pl3p 52", nullptr); // mate 2
 	//pos.set("l2Rp1k1l/6g2/2n+R1p1p1/p5P2/2+bpPP3/6G1K/PPPPsS1P1/9/LN2b3L b GS2NPgs4p 1", nullptr); // mate 10
 	//pos.set("ln6K/1ksPg1s+bG/5s2p/ppp3p2/9/P1P3P2/4+p3P/1+r7/LN3L2L b RSb2g2n7p 1", nullptr); // mate 20
-	pos.set("l+R3g3/3+P1g2k/2+Bppp1+Bn/p1s2sspK/9/P1P+RS1pPg/3P2+n2/2+n2P+n2/L6L1 w GL5Pp 1", nullptr); // ïsãlÇ›Åiå„éËmate 1Åj
+	//pos.set("l+R3g3/3+P1g2k/2+Bppp1+Bn/p1s2sspK/9/P1P+RS1pPg/3P2+n2/2+n2P+n2/L6L1 w GL5Pp 1", nullptr); // ïsãlÇ›Åiå„éËmate 1Åj
 	//pos.set("l3B3k/1r7/p1n2s1G1/1p1n5/7pK/P1P2pSgr/9/6G2/L2+s5 b GSNLbnl12p 1", nullptr); // mate 10
+	pos.set("l6S+P/3k5/p2p3pp/1SN1p2sn/1p7/2nBG1P1K/PP1PP3P/6l+r1/+b2G4L w RG4Pgsnlp 1", nullptr); // mate 8
+	//pos.set("l1g4+RK/1k+P3p1p/1p1s3g1/p2pp1+B2/1N7/P2sP1g1P/1P7/2+r1s4/1N6L w BGS2N2L4P3p 1", nullptr); // mate 16
 	//pos.set("2+R5l/6gk1/2s1p2+Pn/2pp1pP1K/6n2/1P1P4P/4Ps3/4R4/8L w 2B2G2S2N8Pg2l 1", nullptr); // ïsãlÇ›
 	//pos.set("lns1S2nl/1r3kg2/4pgsp1/2pp1p2P/pp2P1b2/2P2P1P1/PPSP5/2GBG2R1/LN1K3NL w 2Pp 1", nullptr); // ïsãlÇ›
+
 	auto start = std::chrono::system_clock::now();
 	bool ret = dfpn_andnode(pos);
+	//bool ret = mateMoveInEvenPly(pos, 8);
 	auto end = std::chrono::system_clock::now();
 
 	auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
