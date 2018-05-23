@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\hcp_decoder\bitboard.cpp" />
+    <ClCompile Include="..\hcp_decoder\generateMoves.cpp" />
     <ClCompile Include="..\hcp_decoder\hand.cpp" />
     <ClCompile Include="..\hcp_decoder\init.cpp" />
     <ClCompile Include="..\hcp_decoder\move.cpp" />

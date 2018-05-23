@@ -22,7 +22,7 @@
 #include "position.hpp"
 #include "move.hpp"
 #include "mt64bit.hpp"
-//#include "generateMoves.hpp"
+#include "generateMoves.hpp"
 //#include "tt.hpp"
 //#include "search.hpp"
 
@@ -1642,6 +1642,73 @@ silver_drop_end:
 
 Move Position::mateMoveIn1Ply() {
     return (turn() == Black ? mateMoveIn1Ply<Black>() : mateMoveIn1Ply<White>());
+}
+
+Move Position::mateMoveIn3Ply() {
+	// 1手詰めであるならこれを返す
+	Move m = mateMoveIn1Ply();
+	if (m)
+		return m;
+
+	Color us = turn();
+	Color them = oppositeColor(us);
+
+	StateInfo si;
+	StateInfo si2;
+
+	// 近接王手で味方の利きがあり、敵の利きのない場所を探す。
+	for (MoveList<NeighborCheck> ml(*this); !ml.end(); ++ml)
+	{
+		const Move m = ml.move();
+
+		// 近接王手で、この指し手による駒の移動先に敵の駒がない。
+		Square to = m.to();
+
+		if (
+			// toに利きがあるかどうか。mが移動の指し手の場合、mの元の利きを取り除く必要がある。
+			(m.isDrop() ? attackersTo(us, to) : (attackersTo(us, to, occupiedBB() ^ SetMaskBB[m.from()]) ^ SetMaskBB[m.from()]))
+			// 敵玉の利きは必ずtoにあるのでそれを除いた利きがあるかどうか。
+			&& (attackersTo(them, to) ^ SetMaskBB[kingSquare(them)])
+			)
+		{
+			if (!pseudoLegalMoveIsLegal<false, false>(m, pinnedBB()))
+				continue;
+
+			doMove(m, si);
+
+			// この局面ですべてのevasionを試す
+			for (MoveList<Legal> ml2(*this); !ml2.end(); ++ml2)
+			{
+				const Move m2 = ml2.move();
+
+				// この指し手で逆王手になるなら、不詰めとして扱う
+				if (moveGivesCheck(m2))
+					goto NEXT_CHECK;
+
+				doMove(m2, si2);
+
+				if (!mateMoveIn1Ply())
+				{
+					// 詰んでないので、m2で詰みを逃れている。
+					undoMove(m2);
+					goto NEXT_CHECK;
+				}
+
+				undoMove(m2);
+			}
+
+			// すべて詰んだ
+			undoMove(m);
+
+			// mによって3手で詰む。
+			return m;
+
+		NEXT_CHECK:;
+			undoMove(m);
+		}
+	}
+
+	return Move::moveNone();
 }
 
 void Position::initZobrist() {

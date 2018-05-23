@@ -401,6 +401,7 @@ public:
 
     template <Color US> Move mateMoveIn1Ply();
     Move mateMoveIn1Ply();
+	Move mateMoveIn3Ply();
 
     Ply gamePly() const         { return gamePly_; }
 

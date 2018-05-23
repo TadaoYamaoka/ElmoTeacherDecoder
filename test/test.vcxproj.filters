@@ -14,14 +14,17 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="ソース ファイル\elmo_for_learn">
-      <UniqueIdentifier>{296d327b-7478-4b77-ad56-c5614ef41b85}</UniqueIdentifier>
+      <UniqueIdentifier>{82d691af-f743-4b76-8976-091cbc3614a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="psv_to_hcp.cpp">
+    <ClCompile Include="test.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="..\hcp_decoder\bitboard.cpp">
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hcp_decoder\generateMoves.cpp">
       <Filter>ソース ファイル\elmo_for_learn</Filter>
     </ClCompile>
     <ClCompile Include="..\hcp_decoder\hand.cpp">
@@ -44,9 +47,6 @@
     </ClCompile>
     <ClCompile Include="..\hcp_decoder\square.cpp">
       <Filter>ソース ファイル\elmo_for_learn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\hcp_decoder\generateMoves.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

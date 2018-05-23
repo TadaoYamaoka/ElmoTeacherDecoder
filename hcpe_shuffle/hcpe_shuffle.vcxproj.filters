@@ -45,5 +45,8 @@
     <ClCompile Include="..\hcp_decoder\square.cpp">
       <Filter>ソース ファイル\elmo_for_learn</Filter>
     </ClCompile>
+    <ClCompile Include="..\hcp_decoder\generateMoves.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
