@@ -99,7 +99,7 @@ struct TranspositionTable {
 		// ハッシュの上位32ビット
 		uint32_t hash_high; // 0
 		int depth;
-		Hand hand; // 手駒
+		Hand hand; // 手駒（常に先手の手駒）
 		// TTEntryのインスタンスを作成したタイミングで先端ノードを表すよう1で初期化する
 		int pn; // 1
 		int dn; // 1
@@ -122,7 +122,7 @@ struct TranspositionTable {
 		}
 	}
 
-	TTEntry& LookUp(const Key key, const Hand hand, const bool or_node, const int depth) {
+	TTEntry& LookUp(const Key key, const Hand hand, const int depth) {
 		auto& entries = tt[key & clusters_mask];
 		uint32_t hash_high = key >> 32;
 		// 検索条件に合致するエントリを返す
@@ -149,36 +149,24 @@ struct TranspositionTable {
 						TTEntry& entry_rest = entries.entries[i];
 						if (entry_rest.hash_high == 0) break;
 						if (hash_high == entry_rest.hash_high) {
-							if (or_node && hand.isEqualOrSuperior(entry_rest.hand) || !or_node && entry_rest.hand.isEqualOrSuperior(hand)) {
+							if (hand.isEqualOrSuperior(entry_rest.hand)) {
 								if (entry_rest.pn == 0) {
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
 							}
-							/*else if (or_node && entry_rest.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry_rest.hand)) {
-								if (entry_rest.dn == 0 && entry_rest.depth <= depth) {
-									entry_rest.generation = generation;
-									return entry_rest;
-								}
-							}*/
 						}
 					}
 					entry.generation = generation;
 					return entry;
 				}
 				// 優越関係を満たす局面に証明済みの局面がある場合、それを返す
-				if (or_node && hand.isEqualOrSuperior(entry.hand) || !or_node && entry.hand.isEqualOrSuperior(hand)) {
+				if (hand.isEqualOrSuperior(entry.hand)) {
 					if (entry.pn == 0) {
 						entry.generation = generation;
 						return entry;
 					}
 				}
-				/*else if (or_node && entry.hand.isEqualOrSuperior(hand) || !or_node && hand.isEqualOrSuperior(entry.hand)) {
-					if (entry.dn == 0 && entry.depth <= depth) {
-						entry.generation = generation;
-						return entry;
-					}
-				}*/
 			}
 		}
 
@@ -205,12 +193,30 @@ struct TranspositionTable {
 	}
 
 	TTEntry& LookUp(const Position& n, const bool or_node, const int depth) {
-		return LookUp(n.getBoardKey(), n.hand(n.turn()), or_node, depth);
+		return LookUp(n.getBoardKey(), or_node ? n.hand(n.turn()) : n.hand(oppositeColor(n.turn())), depth);
 	}
 
 	// moveを指した後の子ノードの置換表エントリを返す
-	TTEntry& LookUpChildEntry(Position& n, Move move, bool or_node, const int depth) {
-		return LookUp(n.getBoardKeyAfter(move), n.hand(oppositeColor(n.turn())), !or_node, depth + 1);
+	TTEntry& LookUpChildEntry(const Position& n, const Move move, const bool or_node, const int depth) {
+		// 手駒は常に先手の手駒で表す
+		Hand hand;
+		if (or_node) {
+			hand = n.hand(n.turn());
+			if (move.isDrop()) {
+				hand.minusOne(move.handPieceDropped());
+			}
+			else {
+				const Piece to_pc = n.piece(move.to());
+				if (to_pc != Empty) {
+					const PieceType pt = pieceToPieceType(to_pc);
+					hand.plusOne(pieceTypeToHandPiece(pt));
+				}
+			}
+		}
+		else {
+			hand = n.hand(oppositeColor(n.turn()));
+		}
+		return LookUp(n.getBoardKeyAfter(move), hand, depth + 1);
 	}
 
 	void Resize() {
@@ -284,6 +290,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		}
 		else {
 			// 相手の手番でここに到達した場合は王手回避の手が無かった、
+			// 1手詰めを行っているため、ここに到達することはない
 			entry.pn = 0;
 			entry.dn = kInfinitePnDn;
 		}
