@@ -279,6 +279,50 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		return;
 	}
 
+	// 千日手のチェック
+	switch (n.isDraw(16)) {
+	case RepetitionWin:
+		//cout << "RepetitionWin" << endl;
+		// 連続王手の千日手による勝ち
+		if (or_node) {
+			// ここは通らないはず
+			entry.pn = 0;
+			entry.dn = kInfinitePnDn;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		else {
+			entry.pn = kInfinitePnDn;
+			entry.dn = 0;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		return;
+
+	case RepetitionLose:
+		//cout << "RepetitionLose" << endl;
+		// 連続王手の千日手による負け
+		if (or_node) {
+			entry.pn = kInfinitePnDn;
+			entry.dn = 0;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		else {
+			// ここは通らないはず
+			entry.pn = 0;
+			entry.dn = kInfinitePnDn;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		return;
+
+	case RepetitionDraw:
+		//cout << "RepetitionDraw" << endl;
+		// 普通の千日手
+		// ここは通らないはず
+		entry.pn = kInfinitePnDn;
+		entry.dn = 0;
+		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		return;
+	}
+
 	MovePicker move_picker(n, or_node);
 	if (move_picker.empty()) {
 		// nが先端ノード
@@ -488,6 +532,7 @@ void dfpn_init()
 	transposition_table.Resize();
 }
 
+int64_t searchedNode = 0;
 // 詰将棋探索のエントリポイント
 bool dfpn(Position& r) {
 	// 自玉に王手がかかっていないこと
@@ -495,7 +540,7 @@ bool dfpn(Position& r) {
 	// キャッシュの世代を進める
 	transposition_table.NewSearch();
 
-	int64_t searchedNode = 0;
+	searchedNode = 0;
 	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn/*, false*/, true, 0, searchedNode);
 	const auto& entry = transposition_table.LookUp(r, true, 0);
 
@@ -518,7 +563,7 @@ bool dfpn_andnode(Position& r) {
 	// キャッシュの世代を進める
 	transposition_table.NewSearch();
 
-	int64_t searchedNode = 0;
+	searchedNode = 0;
 	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn/*, false*/, false, 0, searchedNode);
 	const auto& entry = transposition_table.LookUp(r, false, 0);
 

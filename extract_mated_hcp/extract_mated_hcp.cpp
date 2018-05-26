@@ -66,6 +66,8 @@ void test1()
 
 	auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
+	extern int64_t searchedNode;
+	cout << searchedNode << endl;
 	cout << ret << endl;
 	cout << time_ms << "ms" << endl;
 }
@@ -92,6 +94,8 @@ void test2()
 
 	auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
+	extern int64_t searchedNode;
+	cout << searchedNode << endl;
 	cout << ret << endl;
 	cout << time_ms << "ms" << endl;
 }
