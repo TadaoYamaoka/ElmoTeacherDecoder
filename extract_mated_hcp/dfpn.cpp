@@ -332,9 +332,9 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 								n.doMove(m2, si2);
 
 								if (n.mateMoveIn1Ply()) {
-									auto& entry1 = transposition_table.LookUp(n, true, depth + 2);
-									entry1.pn = 0;
-									entry1.dn = kInfinitePnDn;
+									//auto& entry1 = transposition_table.LookUp(n, true, depth + 2);
+									//entry1.pn = 0;
+									//entry1.dn = kInfinitePnDn;
 									//entry1.minimum_distance = std::min(entry1.minimum_distance, depth + 2);
 								}
 								else {
@@ -347,11 +347,6 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 							}
 
 							// ‚·‚×‚Ä‹l‚ñ‚¾
-							auto& entry2 = transposition_table.LookUp(n, true, depth + 1);
-							entry2.pn = 0;
-							entry2.dn = kInfinitePnDn;
-							//entry2.minimum_distance = std::min(entry2.minimum_distance, depth + 1);
-
 							n.undoMove(m);
 
 							entry.pn = 0;
