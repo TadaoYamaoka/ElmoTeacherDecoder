@@ -13,7 +13,9 @@ int main() {
 	Position pos;
 	//pos.set("l2+S1p2K/1B4G2/p4+N1pG/7sR/5P1s1/P1G2Gp1p/2P1Prk+n1/6N2/LNS5L b L8Pbp 1", nullptr); // 開き王手 金
 	//pos.set("l2+S1p2K/1B4G2/p4+N1pG/7sR/4SP1s1/P1G3p1p/2P1Prk+n1/6N2/LNG5L b L8Pbp 1", nullptr); // 開き王手 銀
-	pos.set("lnsgkgsnl/1r1L3b1/pp1pppppp/2p6/B8/9/PPPPPPPPP/7R1/LNSGKGSN1 b - 1", nullptr); // 開き王手 香車
+	//pos.set("lnsgkgsnl/1r1L3b1/pp1pppppp/2p6/B8/9/PPPPPPPPP/7R1/LNSGKGSN1 b - 1", nullptr); // 開き王手 香車
+	//pos.set("lnsgk1snl/4g2b1/pp+Rp1pppp/2p2p3/B8/9/PPPPPPPPP/7R1/LNSGKGSNL b - 1", nullptr); // 開き王手 竜
+	pos.set("ln5+LK/1r1G+B2S1/pksp5/4p1pp1/1PPP1P3/2S1P3+l/P1B2S3/1R2G2+p1/LN3G3 b GN5Pnp 1", nullptr); // 開き王手 歩
 
 	// 王手生成
 	for (MoveList<Check> ml(pos); !ml.end(); ++ml) {
