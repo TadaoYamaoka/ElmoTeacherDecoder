@@ -157,7 +157,6 @@ struct TranspositionTable {
 							}
 						}
 					}
-					entry.generation = generation;
 					return entry;
 				}
 				// —D‰zŠÖŒW‚ğ–‚½‚·‹Ç–Ê‚ÉØ–¾Ï‚İ‚Ì‹Ç–Ê‚ª‚ ‚éê‡A‚»‚ê‚ğ•Ô‚·
