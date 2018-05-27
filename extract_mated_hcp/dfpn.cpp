@@ -272,7 +272,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 	// if (n is a terminal node) { handle n and return; }
 
 	// 1手読みルーチンによるチェック
-	if (or_node && !n.inCheck() && n.mateMoveIn1Ply()) {
+	if (or_node && entry.num_searched == 0 && !n.inCheck() && n.mateMoveIn1Ply()) {
 		entry.pn = 0;
 		entry.dn = kInfinitePnDn;
 		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
