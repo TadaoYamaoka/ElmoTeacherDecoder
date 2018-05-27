@@ -281,12 +281,130 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 
 	// if (n is a terminal node) { handle n and return; }
 
-	// 1手読みルーチンによるチェック
-	if (or_node && entry.num_searched == 0 && !n.inCheck() && n.mateMoveIn1Ply()) {
-		entry.pn = 0;
-		entry.dn = kInfinitePnDn;
-		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
-		return;
+	if (entry.num_searched == 0) {
+		if (or_node) {
+			if (!n.inCheck()) {
+				// 1手読みルーチンによるチェック
+				if (n.mateMoveIn1Ply()) {
+					entry.pn = 0;
+					entry.dn = kInfinitePnDn;
+					//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+					return;
+				}
+				// 3手詰みチェック
+				else {
+					Color us = n.turn();
+					Color them = oppositeColor(us);
+
+					StateInfo si;
+					StateInfo si2;
+
+					// 近接王手で味方の利きがあり、敵の利きのない場所を探す。
+					for (MoveList<NeighborCheck> ml(n); !ml.end(); ++ml)
+					{
+						const Move m = ml.move();
+
+						// 近接王手で、この指し手による駒の移動先に敵の駒がない。
+						Square to = m.to();
+
+						if (
+							// toに利きがあるかどうか。mが移動の指し手の場合、mの元の利きを取り除く必要がある。
+							(m.isDrop() ? n.attackersTo(us, to) : (n.attackersTo(us, to, n.occupiedBB() ^ SetMaskBB[m.from()]) ^ SetMaskBB[m.from()]))
+							// 敵玉の利きは必ずtoにあるのでそれを除いた利きがあるかどうか。
+							&& (n.attackersTo(them, to) ^ SetMaskBB[n.kingSquare(them)])
+							)
+						{
+							if (!n.pseudoLegalMoveIsLegal<false, false>(m, n.pinnedBB()))
+								continue;
+
+							n.doMove(m, si);
+
+							// この局面ですべてのevasionを試す
+							MovePicker move_picker(n, false);
+							for (const auto& move : move_picker)
+							{
+								const Move m2 = move.move;
+
+								// この指し手で逆王手になるなら、不詰めとして扱う
+								if (n.moveGivesCheck(m2))
+									goto NEXT_CHECK;
+
+								n.doMove(m2, si2);
+
+								if (n.mateMoveIn1Ply()) {
+									auto& entry1 = transposition_table.LookUp(n, true, depth + 2);
+									entry1.pn = 0;
+									entry1.dn = kInfinitePnDn;
+									//entry1.minimum_distance = std::min(entry1.minimum_distance, depth + 2);
+								}
+								else {
+									// 詰んでないので、m2で詰みを逃れている。
+									n.undoMove(m2);
+									goto NEXT_CHECK;
+								}
+
+								n.undoMove(m2);
+							}
+
+							// すべて詰んだ
+							auto& entry2 = transposition_table.LookUp(n, true, depth + 1);
+							entry2.pn = 0;
+							entry2.dn = kInfinitePnDn;
+							//entry2.minimum_distance = std::min(entry2.minimum_distance, depth + 1);
+
+							n.undoMove(m);
+
+							entry.pn = 0;
+							entry.dn = kInfinitePnDn;
+							//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+
+							return;
+
+						NEXT_CHECK:;
+							n.undoMove(m);
+						}
+					}
+				}
+			}
+		}
+		else {
+			// 2手読みチェック
+			MovePicker move_picker(n, or_node);
+			StateInfo si2;
+			// この局面ですべてのevasionを試す
+			for (const auto& move : move_picker)
+			{
+				const Move m2 = move.move;
+
+				// この指し手で逆王手になるなら、不詰めとして扱う
+				if (n.moveGivesCheck(m2))
+					goto NO_MATE;
+
+				n.doMove(m2, si2);
+
+				if (n.mateMoveIn1Ply()) {
+					auto& entry1 = transposition_table.LookUp(n, true, depth + 1);
+					entry1.pn = 0;
+					entry1.dn = kInfinitePnDn;
+					//entry1.minimum_distance = std::min(entry1.minimum_distance, depth + 1);
+				}
+				else {
+					// 詰んでないので、m2で詰みを逃れている。
+					n.undoMove(m2);
+					goto NO_MATE;
+				}
+
+				n.undoMove(m2);
+			}
+
+			// すべて詰んだ
+			entry.pn = 0;
+			entry.dn = kInfinitePnDn;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+			return;
+
+		NO_MATE:;
+		}
 	}
 
 	// 千日手のチェック
@@ -483,6 +601,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		}
 
 		StateInfo state_info;
+		//cout << n.toSFEN() << "," << best_move.toUSI() << endl;
 		n.doMove(best_move, state_info);
 		++searchedNode;
 		DFPNwithTCA(n, thpn_child, thdn_child/*, inc_flag*/, !or_node, depth + 1, searchedNode);
