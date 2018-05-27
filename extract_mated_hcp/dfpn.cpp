@@ -62,22 +62,34 @@ const int64_t MAX_SEARCH_NODE = 2097152;
 // 詰将棋エンジン用のMovePicker
 class MovePicker {
 public:
-	explicit MovePicker(const Position& pos, bool or_node) : curr_(moveList_) {
+	explicit MovePicker(const Position& pos, bool or_node) {
 		if (or_node) {
 			last_ = generateMoves<Check>(moveList_, pos);
 			if (pos.inCheck()) {
 				// 自玉が王手の場合、逃げる手かつ王手をかける手を生成
-				last_ = std::remove_if(moveList_, last_, [&pos](const auto& move) {
-					return !pos.pseudoLegalMoveIsEvasion(move, pos.pinnedBB());
-				});
+				ExtMove* curr = moveList_;
+				const Bitboard pinned = pos.pinnedBB();
+				while (curr != last_) {
+					if (!pos.pseudoLegalMoveIsEvasion(curr->move, pinned))
+						curr->move = (--last_)->move;
+					else
+						++curr;
+				}
 			}
 		}
 		else {
-			last_ = generateMoves<Legal>(moveList_, pos);
+			last_ = generateMoves<Evasion>(moveList_, pos);
+			// 玉の移動による自殺手と、pinされている駒の移動による自殺手を削除
+			ExtMove* curr = moveList_;
+			const Bitboard pinned = pos.pinnedBB();
+			while (curr != last_) {
+				if (!pos.pseudoLegalMoveIsLegal<false, false>(curr->move, pinned))
+					curr->move = (--last_)->move;
+				else
+					++curr;
+			}
 		}
 	}
-	void operator ++ () { ++curr_; }
-	Move move() const { return curr_->move; }
 	size_t size() const { return static_cast<size_t>(last_ - moveList_); }
 	ExtMove* begin() { return &moveList_[0]; }
 	ExtMove* end() { return last_; }
@@ -85,7 +97,6 @@ public:
 
 private:
 	ExtMove moveList_[MaxLegalMoves];
-	ExtMove* curr_;
 	ExtMove* last_;
 };
 
