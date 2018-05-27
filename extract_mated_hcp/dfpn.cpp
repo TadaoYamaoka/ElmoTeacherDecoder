@@ -8,7 +8,7 @@
 using namespace std;
 
 const int64_t HASH_SIZE_MB = 4096;
-const int MAX_PLY = 28;
+const int MAX_PLY = 256;
 const int64_t MAX_SEARCH_NODE = 2097152;
 
 // --- ‹l‚İ«Šû’Tõ
@@ -166,6 +166,12 @@ struct TranspositionTable {
 									return entry_rest;
 								}
 							}
+							else {
+								if (entry_rest.dn == 0) {
+									entry_rest.generation = generation;
+									return entry_rest;
+								}
+							}
 						}
 					}
 					return entry;
@@ -173,6 +179,12 @@ struct TranspositionTable {
 				// —D‰zŠÖŒW‚ğ–‚½‚·‹Ç–Ê‚ÉØ–¾Ï‚İ‚Ì‹Ç–Ê‚ª‚ ‚éê‡A‚»‚ê‚ğ•Ô‚·
 				if (hand.isEqualOrSuperior(entry.hand)) {
 					if (entry.pn == 0) {
+						entry.generation = generation;
+						return entry;
+					}
+				}
+				else {
+					if (entry.dn == 0) {
 						entry.generation = generation;
 						return entry;
 					}
