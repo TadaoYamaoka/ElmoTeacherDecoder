@@ -160,14 +160,14 @@ struct TranspositionTable {
 						TTEntry& entry_rest = entries.entries[i];
 						if (entry_rest.hash_high == 0) break;
 						if (hash_high == entry_rest.hash_high) {
-							if (hand.isEqualOrSuperior(entry_rest.hand)) {
-								if (entry_rest.pn == 0) {
+							if (entry_rest.pn == 0) {
+								if (hand.isEqualOrSuperior(entry_rest.hand)) {
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
 							}
-							else {
-								if (entry_rest.dn == 0) {
+							else if (entry_rest.dn == 0) {
+								if (entry_rest.hand.isEqualOrSuperior(hand)) {
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
@@ -177,14 +177,14 @@ struct TranspositionTable {
 					return entry;
 				}
 				// 優越関係を満たす局面に証明済みの局面がある場合、それを返す
-				if (hand.isEqualOrSuperior(entry.hand)) {
-					if (entry.pn == 0) {
+				if (entry.pn == 0) {
+					if (hand.isEqualOrSuperior(entry.hand)) {
 						entry.generation = generation;
 						return entry;
 					}
 				}
-				else {
-					if (entry.dn == 0) {
+				else if (entry.dn == 0) {
+					if (entry.hand.isEqualOrSuperior(hand)) {
 						entry.generation = generation;
 						return entry;
 					}
@@ -791,50 +791,6 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 
 		NO_MATE:;
 		}
-	}
-
-	// 千日手のチェック
-	switch (n.isDraw(16)) {
-	case RepetitionWin:
-		//cout << "RepetitionWin" << endl;
-		// 連続王手の千日手による勝ち
-		if (or_node) {
-			// ここは通らないはず
-			entry.pn = 0;
-			entry.dn = kInfinitePnDn;
-			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
-		}
-		else {
-			entry.pn = kInfinitePnDn;
-			entry.dn = 0;
-			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
-		}
-		return;
-
-	case RepetitionLose:
-		//cout << "RepetitionLose" << endl;
-		// 連続王手の千日手による負け
-		if (or_node) {
-			entry.pn = kInfinitePnDn;
-			entry.dn = 0;
-			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
-		}
-		else {
-			// ここは通らないはず
-			entry.pn = 0;
-			entry.dn = kInfinitePnDn;
-			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
-		}
-		return;
-
-	case RepetitionDraw:
-		//cout << "RepetitionDraw" << endl;
-		// 普通の千日手
-		// ここは通らないはず
-		entry.pn = kInfinitePnDn;
-		entry.dn = 0;
-		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
-		return;
 	}
 
 	MovePicker move_picker(n, or_node);
