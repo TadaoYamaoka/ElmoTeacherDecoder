@@ -654,6 +654,25 @@ bool nomate(const Position& pos) {
 	return true;
 }
 
+// ‰¤è‚Ìw‚µè‚ª‹ßÚ‰¤è‚©
+bool moveGivesNeighborCheck(const Position pos, const Move move)
+{
+	const Color them = oppositeColor(pos.turn());
+	const Square ksq = pos.kingSquare(them);
+
+	const Square to = move.to();
+
+	// “G‹Ê‚Ì8‹ß–T
+	if (pos.attacksFrom<King>(ksq).isSet(to))
+		return true;
+
+	// Œj”n‚É‚æ‚é‰¤è
+	if (move.pieceTypeTo() == Lance)
+		return true;
+
+	return false;
+}
+
 void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_node, int depth, int64_t& searchedNode) {
 	auto& entry = transposition_table.LookUp(n, or_node, depth);
 
@@ -683,7 +702,8 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 						entry.hand.plusOne(move.handPieceDropped());
 					}
 					// Œãè‚ªˆê–‡‚à‚Á‚Ä‚¢‚È‚¢í—Ş‚Ìæè‚Ì‚¿‹î‚ğØ–¾‹î‚Éİ’è‚·‚é
-					entry.hand.setPP(n.hand(n.turn()), n.hand(oppositeColor(n.turn())));
+					if (!moveGivesNeighborCheck(n, move))
+						entry.hand.setPP(n.hand(n.turn()), n.hand(oppositeColor(n.turn())));
 
 					return;
 				}
@@ -787,7 +807,8 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 						entry1.hand.plusOne(move.handPieceDropped());
 					}
 					// Œãè‚ªˆê–‡‚à‚Á‚Ä‚¢‚È‚¢í—Ş‚Ìæè‚Ì‚¿‹î‚ğØ–¾‹î‚Éİ’è‚·‚é
-					entry1.hand.setPP(n.hand(n.turn()), n.hand(oppositeColor(n.turn())));
+					if (!moveGivesNeighborCheck(n, move))
+						entry1.hand.setPP(n.hand(n.turn()), n.hand(oppositeColor(n.turn())));
 				}
 				else {
 					// ‹l‚ñ‚Å‚È‚¢‚Ì‚ÅAm2‚Å‹l‚İ‚ğ“¦‚ê‚Ä‚¢‚éB
@@ -955,7 +976,8 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 				entry.hand.set(pawn | lance | knight | silver | gold | bishop | rook);
 				//cout << bitset<32>(entry.hand.value()) << endl;
 				// Œãè‚ªˆê–‡‚à‚Á‚Ä‚¢‚È‚¢í—Ş‚Ìæè‚Ì‚¿‹î‚ğØ–¾‹î‚Éİ’è‚·‚é
-				entry.hand.setPP(n.hand(oppositeColor(n.turn())), n.hand(n.turn()));
+				if (!(n.checkersBB() & n.attacksFrom<King>(n.kingSquare(n.turn())) || n.checkersBB() & n.attacksFrom<Knight>(n.turn(), n.kingSquare(n.turn()))))
+					entry.hand.setPP(n.hand(oppositeColor(n.turn())), n.hand(n.turn()));
 				//cout << bitset<32>(entry.hand.value()) << endl;
 			}
 		}
