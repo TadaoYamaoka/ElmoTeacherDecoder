@@ -775,6 +775,10 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 						auto& entry1 = transposition_table.LookUp(n, true, depth + 1);
 						entry1.pn = kInfinitePnDn;
 						entry1.dn = 0;
+
+						entry.pn = kInfinitePnDn;
+						entry.dn = 0;
+						//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 					}
 					n.undoMove(m2);
 					goto NO_MATE;
