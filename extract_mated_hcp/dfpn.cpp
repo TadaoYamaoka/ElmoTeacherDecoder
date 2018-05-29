@@ -7,9 +7,10 @@
 
 using namespace std;
 
-const int64_t HASH_SIZE_MB = 4096;
-const int MAX_PLY = 256;
-const int64_t MAX_SEARCH_NODE = 2097152;
+const constexpr int64_t HASH_SIZE_MB = 4096;
+const constexpr int MAX_PLY = 256;
+const constexpr int64_t MAX_SEARCH_NODE = 2097152;
+const constexpr int REPEAT = INT_MAX;
 
 // --- ‹l‚İ«Šû’Tõ
 
@@ -161,13 +162,13 @@ struct TranspositionTable {
 						if (entry_rest.hash_high == 0) break;
 						if (hash_high == entry_rest.hash_high) {
 							if (entry_rest.pn == 0) {
-								if (hand.isEqualOrSuperior(entry_rest.hand)) {
+								if (hand.isEqualOrSuperior(entry_rest.hand) && entry_rest.num_searched != REPEAT) {
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
 							}
 							else if (entry_rest.dn == 0) {
-								if (entry_rest.hand.isEqualOrSuperior(hand)) {
+								if (entry_rest.hand.isEqualOrSuperior(hand) && entry_rest.num_searched != REPEAT) {
 									entry_rest.generation = generation;
 									return entry_rest;
 								}
@@ -178,13 +179,13 @@ struct TranspositionTable {
 				}
 				// —D‰zŠÖŒW‚ğ–‚½‚·‹Ç–Ê‚ÉØ–¾Ï‚İ‚Ì‹Ç–Ê‚ª‚ ‚éê‡A‚»‚ê‚ğ•Ô‚·
 				if (entry.pn == 0) {
-					if (hand.isEqualOrSuperior(entry.hand)) {
+					if (hand.isEqualOrSuperior(entry.hand) && entry.num_searched != REPEAT) {
 						entry.generation = generation;
 						return entry;
 					}
 				}
 				else if (entry.dn == 0) {
-					if (entry.hand.isEqualOrSuperior(hand)) {
+					if (entry.hand.isEqualOrSuperior(hand) && entry.num_searched != REPEAT) {
 						entry.generation = generation;
 						return entry;
 					}
@@ -855,6 +856,55 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 			entry.dn = kInfinitePnDn;
 		}
 
+		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		return;
+	}
+
+	// ç“úè‚Ìƒ`ƒFƒbƒN
+	switch (n.isDraw(16)) {
+	case RepetitionWin:
+		//cout << "RepetitionWin" << endl;
+		// ˜A‘±‰¤è‚Ìç“úè‚É‚æ‚éŸ‚¿
+		if (or_node) {
+			// ‚±‚±‚Í’Ê‚ç‚È‚¢‚Í‚¸
+			entry.pn = 0;
+			entry.dn = kInfinitePnDn;
+			entry.num_searched = REPEAT;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		else {
+			entry.pn = kInfinitePnDn;
+			entry.dn = 0;
+			entry.num_searched = REPEAT;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		return;
+
+	case RepetitionLose:
+		//cout << "RepetitionLose" << endl;
+		// ˜A‘±‰¤è‚Ìç“úè‚É‚æ‚é•‰‚¯
+		if (or_node) {
+			entry.pn = kInfinitePnDn;
+			entry.dn = 0;
+			entry.num_searched = REPEAT;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		else {
+			// ‚±‚±‚Í’Ê‚ç‚È‚¢‚Í‚¸
+			entry.pn = 0;
+			entry.dn = kInfinitePnDn;
+			entry.num_searched = REPEAT;
+			//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		}
+		return;
+
+	case RepetitionDraw:
+		//cout << "RepetitionDraw" << endl;
+		// •’Ê‚Ìç“úè
+		// ‚±‚±‚Í’Ê‚ç‚È‚¢‚Í‚¸
+		entry.pn = kInfinitePnDn;
+		entry.dn = 0;
+		entry.num_searched = REPEAT;
 		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 		return;
 	}
