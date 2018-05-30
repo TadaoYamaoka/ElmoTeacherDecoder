@@ -674,6 +674,19 @@ bool moveGivesNeighborCheck(const Position pos, const Move move)
 	return false;
 }
 
+// 反証駒を計算(持っている持ち駒を最大数にする(後手の持ち駒を加える))
+u32 dp(const Hand& us, const Hand& them) {
+	u32 dp = 0;
+	u32 pawn = us.exists<HPawn>(); if (pawn > 0) dp += pawn + them.exists<HPawn>();
+	u32 lance = us.exists<HLance>(); if (lance > 0) dp += lance + them.exists<HLance>();
+	u32 knight = us.exists<HKnight>(); if (knight > 0) dp += knight + them.exists<HKnight>();
+	u32 silver = us.exists<HSilver>(); if (silver > 0) dp += silver + them.exists<HSilver>();
+	u32 gold = us.exists<HGold>(); if (gold > 0) dp += gold + them.exists<HGold>();
+	u32 bishop = us.exists<HBishop>(); if (bishop > 0) dp += bishop + them.exists<HBishop>();
+	u32 rook = us.exists<HRook>(); if (rook > 0) dp += rook + them.exists<HRook>();
+	return dp;
+}
+
 void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_node, int depth, int64_t& searchedNode) {
 	auto& entry = transposition_table.LookUp(n, or_node, depth);
 
@@ -818,10 +831,34 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 						auto& entry1 = transposition_table.LookUp(n, true, depth + 1);
 						entry1.pn = kInfinitePnDn;
 						entry1.dn = 0;
+						// 反証駒
+						// 持っている持ち駒を最大数にする(後手の持ち駒を加える)
+						entry1.hand.set(dp(n.hand(n.turn()), n.hand(oppositeColor(n.turn()))));
+
+						n.undoMove(m2);
 
 						entry.pn = kInfinitePnDn;
 						entry.dn = 0;
 						//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+						// 子局面の反証駒を設定
+						// 打つ手ならば、反証駒から削除する
+						if (m2.isDrop()) {
+							entry.hand = entry1.hand;
+							entry.hand.minusOne(m2.handPieceDropped());
+						}
+						// 先手の駒を取る手ならば、反証駒に追加する
+						else {
+							const Piece to_pc = n.piece(m2.to());
+							if (to_pc != Empty) {
+								const PieceType pt = pieceToPieceType(to_pc);
+								const HandPiece hp = pieceTypeToHandPiece(pt);
+								if (entry.hand.numOf(hp) > entry1.hand.numOf(hp)) {
+									entry.hand = entry1.hand;
+									entry.hand.plusOne(hp);
+								}
+							}
+						}
+						goto NO_MATE;
 					}
 					n.undoMove(m2);
 					goto NO_MATE;
@@ -848,6 +885,10 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 			// 自分の手番でここに到達した場合は王手の手が無かった、
 			entry.pn = kInfinitePnDn;
 			entry.dn = 0;
+
+			// 反証駒
+			// 持っている持ち駒を最大数にする(後手の持ち駒を加える)
+			entry.hand.set(dp(n.hand(n.turn()), n.hand(oppositeColor(n.turn()))));
 		}
 		else {
 			// 相手の手番でここに到達した場合は王手回避の手が無かった、
@@ -940,6 +981,15 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		if (or_node) {
 			entry.pn = kInfinitePnDn;
 			entry.dn = 0;
+			// 子局面の反証駒の積集合
+			u32 pawn = UINT_MAX;
+			u32 lance = UINT_MAX;
+			u32 knight = UINT_MAX;
+			u32 silver = UINT_MAX;
+			u32 gold = UINT_MAX;
+			u32 bishop = UINT_MAX;
+			u32 rook = UINT_MAX;
+			bool first = true;
 			for (const auto& move : move_picker) {
 				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
 				if (child_entry.pn == 0) {
@@ -949,15 +999,19 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 					entry.pn = 0;
 					entry.dn = kInfinitePnDn;
 					// 子局面の証明駒を設定
-					entry.hand = child_entry.hand;
 					// 打つ手ならば、証明駒に追加する
 					if (move.move.isDrop()) {
-						entry.hand.plusOne(move.move.handPieceDropped());
+						const HandPiece hp = move.move.handPieceDropped();
+						if (entry.hand.numOf(hp) > child_entry.hand.numOf(hp)) {
+							entry.hand = child_entry.hand;
+							entry.hand.plusOne(move.move.handPieceDropped());
+						}
 					}
 					// 後手の駒を取る手ならば、証明駒から削除する
 					else {
 						const Piece to_pc = n.piece(move.move.to());
 						if (to_pc != Empty) {
+							entry.hand = child_entry.hand;
 							const PieceType pt = pieceToPieceType(to_pc);
 							const HandPiece hp = pieceTypeToHandPiece(pt);
 							if (entry.hand.exists(hp))
@@ -967,10 +1021,51 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 					//cout << bitset<32>(entry.hand.value()) << endl;
 					break;
 				}
+				else if (entry.dn == 0) {
+					if (child_entry.dn == 0) {
+						const Hand& child_dp = child_entry.hand;
+						// 歩
+						const u32 child_pawn = child_dp.exists<HPawn>();
+						if (child_pawn < pawn) pawn = child_pawn;
+						// 香車
+						const u32 child_lance = child_dp.exists<HLance>();
+						if (child_lance < lance) lance = child_lance;
+						// 桂馬
+						const u32 child_knight = child_dp.exists<HKnight>();
+						if (child_knight < knight) knight = child_knight;
+						// 銀
+						const u32 child_silver = child_dp.exists<HSilver>();
+						if (child_silver < silver) silver = child_silver;
+						// 金
+						const u32 child_gold = child_dp.exists<HGold>();
+						if (child_gold < gold) gold = child_gold;
+						// 角
+						const u32 child_bishop = child_dp.exists<HBishop>();
+						if (child_bishop < bishop) bishop = child_bishop;
+						// 飛車
+						const u32 child_rook = child_dp.exists<HRook>();
+						if (child_rook < rook) rook = child_rook;
+					}
+				}
 				entry.pn = std::min(entry.pn, child_entry.pn);
 				entry.dn += child_entry.dn;
 			}
 			entry.dn = std::min(entry.dn, kInfinitePnDn);
+			if (entry.dn == 0) {
+				// 不詰みの場合
+				//cout << n.hand(n.turn()).value() << "," << entry.hand.value() << ",";
+				// 先手が一枚も持っていない種類の先手の持ち駒を反証駒から削除する
+				u32 curr_pawn = entry.hand.exists<HPawn>(); if (curr_pawn == 0) pawn = 0; else if (pawn < curr_pawn) pawn = curr_pawn;
+				u32 curr_lance = entry.hand.exists<HLance>(); if (curr_lance == 0) lance = 0; else if (lance < curr_lance) lance = curr_lance;
+				u32 curr_knight = entry.hand.exists<HKnight>(); if (curr_knight == 0) knight = 0; else if (knight < curr_knight) knight = curr_knight;
+				u32 curr_silver = entry.hand.exists<HSilver>(); if (curr_silver == 0) silver = 0; else if (silver < curr_silver) silver = curr_silver;
+				u32 curr_gold = entry.hand.exists<HGold>(); if (curr_gold == 0) gold = 0; else if (gold < curr_gold) gold = curr_gold;
+				u32 curr_bishop = entry.hand.exists<HBishop>(); if (curr_bishop == 0) bishop = 0; else if (bishop < curr_bishop) bishop = curr_bishop;
+				u32 curr_rook = entry.hand.exists<HRook>(); if (curr_rook == 0) rook = 0; else if (rook < curr_rook) rook = curr_rook;
+				// 反証駒に子局面の証明駒の積集合を設定
+				entry.hand.set(pawn | lance | knight | silver | gold | bishop | rook);
+				//cout << entry.hand.value() << endl;
+			}
 		}
 		else {
 			entry.pn = 0;
@@ -986,8 +1081,6 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 			bool all_mate = true;
 			for (const auto& move : move_picker) {
 				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
-				entry.pn += child_entry.pn;
-				entry.dn = std::min(entry.dn, child_entry.dn);
 				if (all_mate) {
 					if (child_entry.pn == 0) {
 						const Hand& child_pp = child_entry.hand;
@@ -1016,6 +1109,35 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 					else
 						all_mate = false;
 				}
+				if (child_entry.dn == 0) {
+					// 不詰みの場合
+					entry.pn = kInfinitePnDn;
+					entry.dn = 0;
+					// 子局面の反証駒を設定
+					// 打つ手ならば、反証駒から削除する
+					if (move.move.isDrop()) {
+						const HandPiece hp = move.move.handPieceDropped();
+						if (entry.hand.numOf(hp) < child_entry.hand.numOf(hp)) {
+							entry.hand = child_entry.hand;
+							entry.hand.minusOne(hp);
+						}
+					}
+					// 先手の駒を取る手ならば、反証駒に追加する
+					else {
+						const Piece to_pc = n.piece(move.move.to());
+						if (to_pc != Empty) {
+							const PieceType pt = pieceToPieceType(to_pc);
+							const HandPiece hp = pieceTypeToHandPiece(pt);
+							if (entry.hand.numOf(hp) > child_entry.hand.numOf(hp)) {
+								entry.hand = child_entry.hand;
+								entry.hand.plusOne(hp);
+							}
+						}
+					}
+					break;
+				}
+				entry.pn += child_entry.pn;
+				entry.dn = std::min(entry.dn, child_entry.dn);
 			}
 			entry.pn = std::min(entry.pn, kInfinitePnDn);
 			if (entry.pn == 0) {
@@ -1023,6 +1145,13 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 				//cout << n.toSFEN() << " and" << endl;
 				//cout << bitset<32>(entry.hand.value()) << endl;
 				// 証明駒に子局面の証明駒の和集合を設定
+				u32 curr_pawn = entry.hand.exists<HPawn>(); if (pawn > curr_pawn) pawn = curr_pawn;
+				u32 curr_lance = entry.hand.exists<HLance>(); if (lance > curr_lance) lance = curr_lance;
+				u32 curr_knight = entry.hand.exists<HKnight>(); if (knight > curr_knight) knight = curr_knight;
+				u32 curr_silver = entry.hand.exists<HSilver>(); if (silver > curr_silver) silver = curr_silver;
+				u32 curr_gold = entry.hand.exists<HGold>(); if (gold > curr_gold) gold = curr_gold;
+				u32 curr_bishop = entry.hand.exists<HBishop>(); if (bishop > curr_bishop) bishop = curr_bishop;
+				u32 curr_rook = entry.hand.exists<HRook>(); if (rook > curr_rook) rook = curr_rook;
 				entry.hand.set(pawn | lance | knight | silver | gold | bishop | rook);
 				//cout << bitset<32>(entry.hand.value()) << endl;
 				// 後手が一枚も持っていない種類の先手の持ち駒を証明駒に設定する
