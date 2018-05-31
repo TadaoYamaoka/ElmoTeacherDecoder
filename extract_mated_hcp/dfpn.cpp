@@ -137,6 +137,8 @@ struct TranspositionTable {
 	TTEntry& LookUp(const Key key, const Hand hand, const int depth) {
 		auto& entries = tt[key & clusters_mask];
 		uint32_t hash_high = key >> 32;
+		int max_pn = 1;
+		int max_dn = 1;
 		// ŒŸõğŒ‚É‡’v‚·‚éƒGƒ“ƒgƒŠ‚ğ•Ô‚·
 		for (size_t i = 0; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
 			TTEntry& entry = entries.entries[i];
@@ -145,8 +147,8 @@ struct TranspositionTable {
 				entry.hash_high = hash_high;
 				entry.depth = depth;
 				entry.hand = hand;
-				entry.pn = 1;
-				entry.dn = 1;
+				entry.pn = max_pn;
+				entry.dn = max_dn;
 				entry.generation = generation;
 				//entry.minimum_distance = kInfiniteDepth;
 				entry.num_searched = 0;
@@ -189,6 +191,12 @@ struct TranspositionTable {
 						entry.generation = generation;
 						return entry;
 					}
+				}
+				else if (entry.hand.isEqualOrSuperior(hand)) {
+					if (entry.pn > max_pn) max_pn = entry.pn;
+				}
+				else if (hand.isEqualOrSuperior(entry.hand)) {
+					if (entry.dn > max_dn) max_dn = entry.dn;
 				}
 			}
 		}
