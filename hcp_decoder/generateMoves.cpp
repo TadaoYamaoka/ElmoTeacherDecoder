@@ -766,11 +766,11 @@ namespace {
 						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB();
 						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp)) {
 							const Square to = dstBB.firstOneFromSQ11();
-							(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 							// 成れる場合
 							if (pawnAttack(opp, ksq).isSet(to) && canPromote(US, makeRank(to))) {
 								(*moveList++).move = makePromoteMove<Capture>(pt, from, to, pos);
 							}
+							(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 						}
 					}
 					break;
