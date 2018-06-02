@@ -770,6 +770,7 @@ namespace {
 							if (pawnAttack(opp, ksq).isSet(to) && canPromote(US, makeRank(to))) {
 								(*moveList++).move = makePromoteMove<Capture>(pt, from, to, pos);
 							}
+							// 成らない手を後に生成
 							(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 						}
 					}
