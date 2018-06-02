@@ -960,31 +960,21 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 	// TODO(nodchip): このタイミングでminimum distanceを保存するのが正しいか確かめる
 	//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 
-	bool first_time = true;
 	while (searchedNode < MAX_SEARCH_NODE) {
 		++entry.num_searched;
 
-		// determine whether thpn and thdn are increased.
-		// if (n is a leaf) inc flag = false;
-		/*if (entry.pn == 1 && entry.dn == 1) {
-			inc_flag = false;
-		}*/
-
-		// if (n has an unproven old child) inc flag = true;
-		/*for (const auto& move : move_picker) {
-			// unproven old childの定義はminimum distanceがこのノードよりも小さいノードだと理解しているのだけど、
-			// 合っているか自信ない
-			const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
-			if (entry.minimum_distance > child_entry.minimum_distance &&
-				child_entry.pn != kInfinitePnDn &&
-				child_entry.dn != kInfinitePnDn) {
-				inc_flag = true;
-				break;
-			}
-		}*/
+		Move best_move;
+		int thpn_child;
+		int thdn_child;
 
 		// expand and compute pn(n) and dn(n);
 		if (or_node) {
+			// ORノードでは最も証明数が小さい = 玉の逃げ方の個数が少ない = 詰ましやすいノードを選ぶ
+			int best_pn = kInfinitePnDn;
+			int second_best_pn = kInfinitePnDn;
+			int best_dn = 0;
+			int best_num_search = INT_MAX;
+
 			entry.pn = kInfinitePnDn;
 			entry.dn = 0;
 			// 子局面の反証駒の積集合
@@ -1055,6 +1045,18 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 				}
 				entry.pn = std::min(entry.pn, child_entry.pn);
 				entry.dn += child_entry.dn;
+
+				if (child_entry.pn < best_pn ||
+					child_entry.pn == best_pn && best_num_search > child_entry.num_searched) {
+					second_best_pn = best_pn;
+					best_pn = child_entry.pn;
+					best_dn = child_entry.dn;
+					best_move = move;
+					best_num_search = child_entry.num_searched;
+				}
+				else if (child_entry.pn < second_best_pn) {
+					second_best_pn = child_entry.pn;
+				}
 			}
 			entry.dn = std::min(entry.dn, kInfinitePnDn);
 			if (entry.dn == 0) {
@@ -1072,8 +1074,18 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 				entry.hand.set(pawn | lance | knight | silver | gold | bishop | rook);
 				//cout << entry.hand.value() << endl;
 			}
+			else {
+				thpn_child = std::min(thpn, second_best_pn + 1);
+				thdn_child = std::min(thdn - entry.dn + best_dn, kInfinitePnDn);
+			}
 		}
 		else {
+			// ANDノードでは最も反証数の小さい = 王手の掛け方の少ない = 不詰みを示しやすいノードを選ぶ
+			int best_dn = kInfinitePnDn;
+			int second_best_dn = kInfinitePnDn;
+			int best_pn = 0;
+			int best_num_search = INT_MAX;
+
 			entry.pn = 0;
 			entry.dn = kInfinitePnDn;
 			// 子局面の証明駒の和集合
@@ -1144,6 +1156,17 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 				}
 				entry.pn += child_entry.pn;
 				entry.dn = std::min(entry.dn, child_entry.dn);
+
+				if (child_entry.dn < best_dn ||
+					child_entry.dn == best_dn && best_num_search > child_entry.num_searched) {
+					second_best_dn = best_dn;
+					best_dn = child_entry.dn;
+					best_pn = child_entry.pn;
+					best_move = move;
+				}
+				else if (child_entry.dn < second_best_dn) {
+					second_best_dn = child_entry.dn;
+				}
 			}
 			entry.pn = std::min(entry.pn, kInfinitePnDn);
 			if (entry.pn == 0) {
@@ -1165,87 +1188,16 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 					entry.hand.setPP(n.hand(oppositeColor(n.turn())), n.hand(n.turn()));
 				//cout << bitset<32>(entry.hand.value()) << endl;
 			}
+			else {
+				thpn_child = std::min(thpn - entry.pn + best_pn, kInfinitePnDn);
+				thdn_child = std::min(thdn, second_best_dn + 1);
+			}
 		}
 
-
-		// if (first time && inc flag) {
-		//   // increase thresholds
-		//   thpn = max(thpn, pn(n) + 1);
-		//   thdn = max(thdn, dn(n) + 1);
-		// }
-		/*if (first_time && inc_flag) {
-			thpn = std::max(thpn, entry.pn + 1);
-			thpn = std::min(thpn, kInfinitePnDn);
-			thdn = std::max(thdn, entry.dn + 1);
-			thdn = std::min(thdn, kInfinitePnDn);
-		}*/
-
-		// if (pn(n) ? thpn || dn(n) ? thdn)
+		// if (pn(n) >= thpn || dn(n) >= thdn)
 		//   break; // termination condition is satisfied
 		if (entry.pn >= thpn || entry.dn >= thdn) {
 			break;
-		}
-
-		// first time = false;
-		first_time = false;
-
-		// find the best child n1 and second best child n2;
-		// if (n is an OR node) { /* set new thresholds */
-		//   thpn child = min(thpn, pn(n2) + 1);
-		//   thdn child = thdn - dn(n) + dn(n1);
-		// else {
-		//   thpn child = thpn - pn(n) + pn(n1);
-		//   thdn child = min(thdn, dn(n2) + 1);
-		// }
-		Move best_move;
-		int thpn_child;
-		int thdn_child;
-		if (or_node) {
-			// ORノードでは最も証明数が小さい = 玉の逃げ方の個数が少ない = 詰ましやすいノードを選ぶ
-			int best_pn = kInfinitePnDn;
-			int second_best_pn = kInfinitePnDn;
-			int best_dn = 0;
-			int best_num_search = INT_MAX;
-			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
-				if (child_entry.pn < best_pn ||
-					child_entry.pn == best_pn && best_num_search > child_entry.num_searched) {
-					second_best_pn = best_pn;
-					best_pn = child_entry.pn;
-					best_dn = child_entry.dn;
-					best_move = move;
-					best_num_search = child_entry.num_searched;
-				}
-				else if (child_entry.pn < second_best_pn) {
-					second_best_pn = child_entry.pn;
-				}
-			}
-
-			thpn_child = std::min(thpn, second_best_pn + 1);
-			thdn_child = std::min(thdn - entry.dn + best_dn, kInfinitePnDn);
-		}
-		else {
-			// ANDノードでは最も反証数の小さい = 王手の掛け方の少ない = 不詰みを示しやすいノードを選ぶ
-			int best_dn = kInfinitePnDn;
-			int second_best_dn = kInfinitePnDn;
-			int best_pn = 0;
-			int best_num_search = INT_MAX;
-			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
-				if (child_entry.dn < best_dn ||
-					child_entry.dn == best_dn && best_num_search > child_entry.num_searched) {
-					second_best_dn = best_dn;
-					best_dn = child_entry.dn;
-					best_pn = child_entry.pn;
-					best_move = move;
-				}
-				else if (child_entry.dn < second_best_dn) {
-					second_best_dn = child_entry.dn;
-				}
-			}
-
-			thpn_child = std::min(thpn - entry.pn + best_pn, kInfinitePnDn);
-			thdn_child = std::min(thdn, second_best_dn + 1);
 		}
 
 		StateInfo state_info;
