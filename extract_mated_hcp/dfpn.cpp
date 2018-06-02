@@ -8,7 +8,6 @@
 using namespace std;
 
 const constexpr int64_t HASH_SIZE_MB = 4096;
-const constexpr int MAX_PLY = 256;
 const constexpr int64_t MAX_SEARCH_NODE = 2097152;
 const constexpr int REPEAT = INT_MAX;
 
@@ -274,10 +273,9 @@ struct TranspositionTable {
 	}
 
 	void NewSearch() {
-		generation = (generation + 1) & 0xff;
+		++generation;
 	}
 
-	int tt_mask = 0;
 	void* tt_raw = nullptr;
 	Cluster* tt = nullptr;
 	int64_t num_clusters = 0;
@@ -286,7 +284,7 @@ struct TranspositionTable {
 };
 
 static const constexpr int kInfinitePnDn = 100000000;
-static const constexpr int kMaxDepth = MAX_PLY;
+static const constexpr int kMaxDepth = 256;
 
 TranspositionTable transposition_table;
 
