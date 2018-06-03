@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#if 0
+#if 1
 // 王手生成テスト
 int main() {
 	initTable();
@@ -15,18 +15,23 @@ int main() {
 	//pos.set("l2+S1p2K/1B4G2/p4+N1pG/7sR/4SP1s1/P1G3p1p/2P1Prk+n1/6N2/LNG5L b L8Pbp 1", nullptr); // 開き王手 銀
 	//pos.set("lnsgkgsnl/1r1L3b1/pp1pppppp/2p6/B8/9/PPPPPPPPP/7R1/LNSGKGSN1 b - 1", nullptr); // 開き王手 香車
 	//pos.set("lnsgk1snl/4g2b1/pp+Rp1pppp/2p2p3/B8/9/PPPPPPPPP/7R1/LNSGKGSNL b - 1", nullptr); // 開き王手 竜
-	pos.set("ln5+LK/1r1G+B2S1/pksp5/4p1pp1/1PPP1P3/2S1P3+l/P1B2S3/1R2G2+p1/LN3G3 b GN5Pnp 1", nullptr); // 開き王手 歩
+	//pos.set("ln5+LK/1r1G+B2S1/pksp5/4p1pp1/1PPP1P3/2S1P3+l/P1B2S3/1R2G2+p1/LN3G3 b GN5Pnp 1", nullptr); // 開き王手 歩
+	//pos.set("2S1G4/9/R1S1k1S1R/9/2G3G2/3L1L3/B1N3N1B/4K4/4L4 b GS2NL18P 1", nullptr); // 最大数
+	pos.set("9/R1S1k1S1R/2+P3G2/2G3G2/9/B1NL1LN1B/9/4K4/4L4 b G2S2NL17P 1", nullptr); // 最大数
 
 	// 王手生成
+	int cnt = 0;
 	for (MoveList<Check> ml(pos); !ml.end(); ++ml) {
 		std::cout << ml.move().toUSI() << std::endl;
+		cnt++;
 	}
+	std::cout << cnt << std::endl;
 
 	return 0;
 }
 #endif
 
-#if 1
+#if 0
 // 近接王手生成テスト
 int main() {
 	initTable();

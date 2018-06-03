@@ -89,6 +89,7 @@ public:
 					++curr;
 			}
 		}
+		assert(size() <= 65);
 	}
 	size_t size() const { return static_cast<size_t>(last_ - moveList_); }
 	ExtMove* begin() { return &moveList_[0]; }
@@ -96,7 +97,7 @@ public:
 	bool empty() const { return size() == 0; }
 
 private:
-	ExtMove moveList_[MaxLegalMoves];
+	ExtMove moveList_[65];
 	ExtMove* last_;
 };
 
