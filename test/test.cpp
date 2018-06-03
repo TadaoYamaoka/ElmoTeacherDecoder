@@ -17,7 +17,8 @@ int main() {
 	//pos.set("lnsgk1snl/4g2b1/pp+Rp1pppp/2p2p3/B8/9/PPPPPPPPP/7R1/LNSGKGSNL b - 1", nullptr); // ŠJ‚«‰¤è —³
 	//pos.set("ln5+LK/1r1G+B2S1/pksp5/4p1pp1/1PPP1P3/2S1P3+l/P1B2S3/1R2G2+p1/LN3G3 b GN5Pnp 1", nullptr); // ŠJ‚«‰¤è •à
 	//pos.set("2S1G4/9/R1S1k1S1R/9/2G3G2/3L1L3/B1N3N1B/4K4/4L4 b GS2NL18P 1", nullptr); // Å‘å”
-	pos.set("9/R1S1k1S1R/2+P3G2/2G3G2/9/B1NL1LN1B/9/4K4/4L4 b G2S2NL17P 1", nullptr); // Å‘å”
+	//pos.set("9/R1S1k1S1R/2+P3G2/2G3G2/9/B1NL1LN1B/9/4K4/4L4 b G2S2NL17P 1", nullptr); // Å‘å” 65
+	pos.set("5S1S1/RS5k1/5G3/9/5NL1L/9/9/1K7/B8 b RB3GS3N2L18P 1", nullptr); // Å‘å” 67
 
 	// ‰¤è¶¬
 	int cnt = 0;
