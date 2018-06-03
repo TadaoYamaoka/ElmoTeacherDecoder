@@ -181,13 +181,11 @@ struct TranspositionTable {
 				// —D‰zŠÖŒW‚ğ–‚½‚·‹Ç–Ê‚ÉØ–¾Ï‚İ‚Ì‹Ç–Ê‚ª‚ ‚éê‡A‚»‚ê‚ğ•Ô‚·
 				if (entry.pn == 0) {
 					if (hand.isEqualOrSuperior(entry.hand) && entry.num_searched != REPEAT) {
-						entry.generation = generation;
 						return entry;
 					}
 				}
 				else if (entry.dn == 0) {
 					if (entry.hand.isEqualOrSuperior(hand) && entry.num_searched != REPEAT) {
-						entry.generation = generation;
 						return entry;
 					}
 				}
