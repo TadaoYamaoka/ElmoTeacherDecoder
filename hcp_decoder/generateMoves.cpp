@@ -1099,8 +1099,8 @@ namespace {
 					// 筋が同じ場合
 					else {
 						// 間にある駒が一つで、敵駒の場合
-						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB() & kingAttack(ksq);
-						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp)) {
+						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB();
+						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp) & kingAttack(ksq)) {
 							const Square to = dstBB.firstOneFromSQ11();
 							(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 							// 成れる場合
@@ -1174,8 +1174,8 @@ namespace {
 					// 対角上にある場合
 					else {
 						// 間にある駒が一つで、敵駒の場合
-						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB() & kingAttack(ksq);
-						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp)) {
+						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB();
+						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp) & kingAttack(ksq)) {
 							const Square to = dstBB.firstOneFromSQ11();
 							// 成れる場合は必ず成る
 							if (canPromote(US, makeRank(to)) | canPromote(US, makeRank(from))) {
@@ -1204,8 +1204,8 @@ namespace {
 					// 直線上にある場合
 					else {
 						// 間にある駒が一つで、敵駒の場合
-						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB() & kingAttack(ksq);
-						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp)) {
+						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB();
+						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp) & kingAttack(ksq)) {
 							const Square to = dstBB.firstOneFromSQ11();
 							// 成れる場合は必ず成る
 							if (canPromote(US, makeRank(to)) | canPromote(US, makeRank(from))) {
@@ -1231,8 +1231,8 @@ namespace {
 					// 対角上にある場合
 					else {
 						// 間にある駒が一つで、敵駒の場合
-						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB() & kingAttack(ksq);
-						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp)) {
+						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB();
+						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp) & kingAttack(ksq)) {
 							const Square to = dstBB.firstOneFromSQ11();
 							(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 						}
@@ -1252,8 +1252,8 @@ namespace {
 					// 直線上にある場合
 					else {
 						// 間にある駒が一つで、敵駒の場合
-						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB() & kingAttack(ksq);
-						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp)) {
+						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB();
+						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp) & kingAttack(ksq)) {
 							const Square to = dstBB.firstOneFromSQ11();
 							(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 						}

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#if 1
+#if 0
 // 王手生成テスト
 int main() {
 	initTable();
@@ -26,12 +26,13 @@ int main() {
 }
 #endif
 
-#if 0
+#if 1
 // 近接王手生成テスト
 int main() {
 	initTable();
 	Position pos;
-	pos.set("1n3g3/7B1/ppSPp1ppp/7P1/R1p1kp1R1/2Pp5/PP3GP1P/1BS4S1/L1NG1KN1L b GSN2LPp 1", nullptr); // 近接王手
+	//pos.set("1n3g3/7B1/ppSPp1ppp/7P1/R1p1kp1R1/2Pp5/PP3GP1P/1BS4S1/L1NG1KN1L b GSN2LPp 1", nullptr); // 近接王手
+	pos.set("ln2g3l/2+Rskg3/p2sppL2/2pp1sP1p/2P2n3/B2P1N1p1/P1NKPP2P/1G1S1+p1P1/7+rL b B2Pg 98", nullptr); // 近接王手
 
 	// 王手生成
 	for (MoveList<NeighborCheck> ml(pos); !ml.end(); ++ml) {
