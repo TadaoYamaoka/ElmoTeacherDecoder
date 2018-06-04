@@ -1111,11 +1111,12 @@ namespace {
 						Bitboard dstBB = betweenBB(from, ksq) & pos.occupiedBB();
 						if (dstBB.isOneBit() && dstBB & pos.bbOf(opp) & kingAttack(ksq)) {
 							const Square to = dstBB.firstOneFromSQ11();
-							(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 							// 成れる場合
 							if (pawnAttack(opp, ksq).isSet(to) && canPromote(US, makeRank(to))) {
 								(*moveList++).move = makePromoteMove<Capture>(pt, from, to, pos);
 							}
+							if (isBehind<US, Rank2, Rank8>(makeRank(to))) // 2段目の不成を省く
+								(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 						}
 					}
 					break;
