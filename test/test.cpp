@@ -18,13 +18,28 @@ int main() {
 	//pos.set("ln5+LK/1r1G+B2S1/pksp5/4p1pp1/1PPP1P3/2S1P3+l/P1B2S3/1R2G2+p1/LN3G3 b GN5Pnp 1", nullptr); // ŠJ‚«‰¤è •à
 	//pos.set("2S1G4/9/R1S1k1S1R/9/2G3G2/3L1L3/B1N3N1B/4K4/4L4 b GS2NL18P 1", nullptr); // Å‘å”
 	//pos.set("9/R1S1k1S1R/2+P3G2/2G3G2/9/B1NL1LN1B/9/4K4/4L4 b G2S2NL17P 1", nullptr); // Å‘å” 65
-	pos.set("5S1S1/RS5k1/5G3/9/5NL1L/9/9/1K7/B8 b RB3GS3N2L18P 1", nullptr); // Å‘å” 67
+	//pos.set("5S1S1/RS5k1/5G3/9/5NL1L/9/9/1K7/B8 b RB3GS3N2L18P 1", nullptr); // Å‘å” 67
+	//pos.set("B7B/1R7/6R2/9/4k4/9/9/9/K1N6 b 4G4S3N4L18P 1", nullptr); // Å‘å” 83 ¬‚èŠÜ‚Ş
+	pos.set("4S4/R1S3k1S/4+P3+P/9/8N/4N3N/1L7/B8/5L1LK b RB4GSNL16P 1", nullptr); // Å‘å” 74(73‚Ì2’i–Ú•s¬‚ğœ‚­)
 
 	// ‰¤è¶¬
 	int cnt = 0;
 	for (MoveList<Check> ml(pos); !ml.end(); ++ml) {
 		std::cout << ml.move().toUSI() << std::endl;
 		cnt++;
+	}
+	std::cout << cnt << std::endl;
+
+	// ŒŸØ
+	cnt = 0;
+	StateInfo si;
+	for (MoveList<Legal> ml(pos); !ml.end(); ++ml) {
+		pos.doMove(ml.move(), si);
+		if (pos.inCheck()) {
+			std::cout << ml.move().toUSI() << std::endl;
+			cnt++;
+		}
+		pos.undoMove(ml.move());
 	}
 	std::cout << cnt << std::endl;
 

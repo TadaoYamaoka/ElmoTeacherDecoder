@@ -97,7 +97,7 @@ public:
 	bool empty() const { return size() == 0; }
 
 private:
-	ExtMove moveList_[67];
+	ExtMove moveList_[73];
 	ExtMove* last_;
 };
 
