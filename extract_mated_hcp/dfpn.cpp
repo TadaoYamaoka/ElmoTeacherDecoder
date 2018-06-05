@@ -60,9 +60,10 @@ const constexpr int REPEAT = INT_MAX;
 //
 
 // 詰将棋エンジン用のMovePicker
+template <bool or_node>
 class MovePicker {
 public:
-	explicit MovePicker(const Position& pos, bool or_node) {
+	explicit MovePicker(const Position& pos) {
 		if (or_node) {
 			last_ = generateMoves<Check>(moveList_, pos);
 			if (pos.inCheck()) {
@@ -221,12 +222,14 @@ struct TranspositionTable {
 		return *best_entry;
 	}
 
-	TTEntry& LookUp(const Position& n, const bool or_node, const int depth) {
+	template <bool or_node>
+	TTEntry& LookUp(const Position& n, const int depth) {
 		return LookUp(n.getBoardKey(), or_node ? n.hand(n.turn()) : n.hand(oppositeColor(n.turn())), depth);
 	}
 
 	// moveを指した後の子ノードの置換表エントリを返す
-	TTEntry& LookUpChildEntry(const Position& n, const Move move, const bool or_node, const int depth) {
+	template <bool or_node>
+	TTEntry& LookUpChildEntry(const Position& n, const Move move, const int depth) {
 		// 手駒は常に先手の手駒で表す
 		Hand hand;
 		if (or_node) {
@@ -692,8 +695,9 @@ u32 dp(const Hand& us, const Hand& them) {
 	return dp;
 }
 
-void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_node, int depth, int64_t& searchedNode) {
-	auto& entry = transposition_table.LookUp(n, or_node, depth);
+template <bool or_node>
+void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, int64_t& searchedNode) {
+	auto& entry = transposition_table.LookUp<or_node>(n, depth);
 
 	if (depth > kMaxDepth) {
 		entry.pn = kInfinitePnDn;
@@ -754,7 +758,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 
 							// この局面ですべてのevasionを試す
 							const CheckInfo ci2(n);
-							MovePicker move_picker(n, false);
+							MovePicker<false> move_picker(n);
 							for (const auto& move : move_picker)
 							{
 								const Move m2 = move.move;
@@ -798,7 +802,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		}
 		else {
 			// 2手読みチェック
-			MovePicker move_picker(n, or_node);
+			MovePicker<false> move_picker(n);
 			StateInfo si2;
 			// この局面ですべてのevasionを試す
 			const CheckInfo ci2(n);
@@ -813,7 +817,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 				n.doMove(m2, si2, ci2, false);
 
 				if (const Move move = n.mateMoveIn1Ply()) {
-					auto& entry1 = transposition_table.LookUp(n, true, depth + 1);
+					auto& entry1 = transposition_table.LookUp<true>(n, depth + 1);
 					entry1.pn = 0;
 					entry1.dn = kInfinitePnDn;
 					//entry1.minimum_distance = std::min(entry1.minimum_distance, depth + 1);
@@ -833,7 +837,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 					// 詰んでないので、m2で詰みを逃れている。
 					// 不詰みチェック
 					if (nomate(n)) {
-						auto& entry1 = transposition_table.LookUp(n, true, depth + 1);
+						auto& entry1 = transposition_table.LookUp<true>(n, depth + 1);
 						entry1.pn = kInfinitePnDn;
 						entry1.dn = 0;
 						// 反証駒
@@ -882,7 +886,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		}
 	}
 
-	MovePicker move_picker(n, or_node);
+	MovePicker<or_node> move_picker(n);
 	if (move_picker.empty()) {
 		// nが先端ノード
 
@@ -986,7 +990,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 			u32 rook = UINT_MAX;
 			bool first = true;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
+				const auto& child_entry = transposition_table.LookUpChildEntry<or_node>(n, move, depth);
 				if (child_entry.pn == 0) {
 					// 詰みの場合
 					//cout << n.toSFEN() << " or" << endl;
@@ -1097,7 +1101,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 			u32 rook = 0;
 			bool all_mate = true;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry(n, move, or_node, depth);
+				const auto& child_entry = transposition_table.LookUpChildEntry<or_node>(n, move, depth);
 				if (all_mate) {
 					if (child_entry.pn == 0) {
 						const Hand& child_pp = child_entry.hand;
@@ -1203,21 +1207,22 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		//cout << n.toSFEN() << "," << best_move.toUSI() << endl;
 		n.doMove(best_move, state_info);
 		++searchedNode;
-		DFPNwithTCA(n, thpn_child, thdn_child/*, inc_flag*/, !or_node, depth + 1, searchedNode);
+		DFPNwithTCA<!or_node>(n, thpn_child, thdn_child/*, inc_flag*/, depth + 1, searchedNode);
 		n.undoMove(best_move);
 	}
 }
 
 // 詰み手順を1つ返す
 // 最短の詰み手順である保証はない
-bool dfs(bool or_node, Position& pos, std::vector<Move>& moves, std::unordered_set<Key>& visited) {
+template <bool or_node>
+bool dfs(Position& pos, std::vector<Move>& moves, std::unordered_set<Key>& visited) {
 	// 一度探索したノードを探索しない
 	if (visited.find(pos.getKey()) != visited.end()) {
 		return false;
 	}
 	visited.insert(pos.getKey());
 
-	MovePicker move_picker(pos, or_node);
+	MovePicker<or_node> move_picker(pos);
 	Move mate1ply = pos.mateMoveIn1Ply();
 	if (mate1ply || move_picker.empty()) {
 		if (mate1ply) {
@@ -1236,7 +1241,7 @@ bool dfs(bool or_node, Position& pos, std::vector<Move>& moves, std::unordered_s
 	}
 
 	for (const auto& move : move_picker) {
-		const auto& child_entry = transposition_table.LookUpChildEntry(pos, move, or_node, 0);
+		const auto& child_entry = transposition_table.LookUpChildEntry<or_node>(pos, move, 0);
 		if (child_entry.pn != 0) {
 			continue;
 		}
@@ -1244,7 +1249,7 @@ bool dfs(bool or_node, Position& pos, std::vector<Move>& moves, std::unordered_s
 		StateInfo state_info;
 		pos.doMove(move, state_info);
 		moves.push_back(move);
-		if (dfs(!or_node, pos, moves, visited)) {
+		if (dfs<!or_node>(pos, moves, visited)) {
 			pos.undoMove(move);
 			return true;
 		}
@@ -1269,8 +1274,8 @@ bool dfpn(Position& r) {
 	transposition_table.NewSearch();
 
 	searchedNode = 0;
-	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn/*, false*/, true, 0, searchedNode);
-	const auto& entry = transposition_table.LookUp(r, true, 0);
+	DFPNwithTCA<true>(r, kInfinitePnDn, kInfinitePnDn/*, false*/, 0, searchedNode);
+	const auto& entry = transposition_table.LookUp<true>(r, 0);
 
 	//cout << searchedNode << endl;
 
@@ -1292,8 +1297,8 @@ bool dfpn_andnode(Position& r) {
 	transposition_table.NewSearch();
 
 	searchedNode = 0;
-	DFPNwithTCA(r, kInfinitePnDn, kInfinitePnDn/*, false*/, false, 0, searchedNode);
-	const auto& entry = transposition_table.LookUp(r, false, 0);
+	DFPNwithTCA<false>(r, kInfinitePnDn, kInfinitePnDn/*, false*/, 0, searchedNode);
+	const auto& entry = transposition_table.LookUp<false>(r, 0);
 
 	//cout << searchedNode << endl;
 
