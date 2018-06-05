@@ -89,7 +89,7 @@ public:
 					++curr;
 			}
 		}
-		assert(size() <= 67);
+		assert(size() <= 73);
 	}
 	size_t size() const { return static_cast<size_t>(last_ - moveList_); }
 	ExtMove* begin() { return &moveList_[0]; }
@@ -708,7 +708,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 		if (or_node) {
 			if (!n.inCheck()) {
 				// 1手読みルーチンによるチェック
-				if (Move move = n.mateMoveIn1Ply()) {
+				if (const Move move = n.mateMoveIn1Ply()) {
 					entry.pn = 0;
 					entry.dn = kInfinitePnDn;
 					//entry.minimum_distance = std::min(entry.minimum_distance, depth);
@@ -735,6 +735,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 					StateInfo si2;
 
 					// 近接王手で味方の利きがあり、敵の利きのない場所を探す。
+					const CheckInfo ci(n);
 					for (MoveList<NeighborCheck> ml(n); !ml.end(); ++ml)
 					{
 						const Move m = ml.move();
@@ -749,22 +750,20 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 							&& (n.attackersTo(them, to) ^ SetMaskBB[n.kingSquare(them)])
 							)
 						{
-							if (!n.pseudoLegalMoveIsLegal<false, false>(m, n.pinnedBB()))
-								continue;
-
-							n.doMove(m, si);
+							n.doMove(m, si, ci, true);
 
 							// この局面ですべてのevasionを試す
+							const CheckInfo ci2(n);
 							MovePicker move_picker(n, false);
 							for (const auto& move : move_picker)
 							{
 								const Move m2 = move.move;
 
 								// この指し手で逆王手になるなら、不詰めとして扱う
-								if (n.moveGivesCheck(m2))
+								if (n.moveGivesCheck(m2, ci2))
 									goto NEXT_CHECK;
 
-								n.doMove(m2, si2);
+								n.doMove(m2, si2, ci2, false);
 
 								if (n.mateMoveIn1Ply()) {
 									//auto& entry1 = transposition_table.LookUp(n, true, depth + 2);
@@ -802,17 +801,18 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, bool or_nod
 			MovePicker move_picker(n, or_node);
 			StateInfo si2;
 			// この局面ですべてのevasionを試す
+			const CheckInfo ci2(n);
 			for (const auto& move : move_picker)
 			{
 				const Move m2 = move.move;
 
 				// この指し手で逆王手になるなら、不詰めとして扱う
-				if (n.moveGivesCheck(m2))
+				if (n.moveGivesCheck(m2, ci2))
 					goto NO_MATE;
 
-				n.doMove(m2, si2);
+				n.doMove(m2, si2, ci2, false);
 
-				if (Move move = n.mateMoveIn1Ply()) {
+				if (const Move move = n.mateMoveIn1Ply()) {
 					auto& entry1 = transposition_table.LookUp(n, true, depth + 1);
 					entry1.pn = 0;
 					entry1.dn = kInfinitePnDn;
