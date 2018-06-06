@@ -111,12 +111,12 @@ struct TranspositionTable {
 	struct TTEntry {
 		// ハッシュの上位32ビット
 		uint32_t hash_high; // 0
-		int depth;
 		Hand hand; // 手駒（常に先手の手駒）
 		// TTEntryのインスタンスを作成したタイミングで先端ノードを表すよう1で初期化する
 		int pn; // 1
 		int dn; // 1
-		uint32_t generation/* : 8*/; // 0
+		uint16_t depth;
+		uint16_t generation; // 0
 		// ルートノードからの最短距離
 		// 初期値を∞として全てのノードより最短距離が長いとみなす
 		//int minimum_distance : 24; // UINT_MAX
@@ -135,19 +135,19 @@ struct TranspositionTable {
 		}
 	}
 
-	TTEntry& LookUp(const Key key, const Hand hand, const int depth) {
+	TTEntry& LookUp(const Key key, const Hand hand, const uint16_t depth) {
 		auto& entries = tt[key & clusters_mask];
 		uint32_t hash_high = key >> 32;
 		return LookUpDirect(entries, hash_high, hand, depth);
 	}
 
-	TTEntry& LookUpDirect(Cluster& entries, const uint32_t hash_high, const Hand hand, const int depth) {
+	TTEntry& LookUpDirect(Cluster& entries, const uint32_t hash_high, const Hand hand, const uint16_t depth) {
 		int max_pn = 1;
 		int max_dn = 1;
 		// 検索条件に合致するエントリを返す
 		for (size_t i = 0; i < sizeof(entries.entries) / sizeof(TTEntry); i++) {
 			TTEntry& entry = entries.entries[i];
-			if (entry.hash_high == 0 || generation != entry.generation) {
+			if (generation != entry.generation) {
 				// 空のエントリが見つかった場合
 				entry.hash_high = hash_high;
 				entry.depth = depth;
@@ -227,7 +227,7 @@ struct TranspositionTable {
 	}
 
 	template <bool or_node>
-	TTEntry& LookUp(const Position& n, const int depth) {
+	TTEntry& LookUp(const Position& n, const uint16_t depth) {
 		return LookUp(n.getBoardKey(), or_node ? n.hand(n.turn()) : n.hand(oppositeColor(n.turn())), depth);
 	}
 
@@ -258,7 +258,7 @@ struct TranspositionTable {
 
 	// moveを指した後の子ノードの置換表エントリを返す
 	template <bool or_node>
-	TTEntry& LookUpChildEntry(const Position& n, const Move move, const int depth) {
+	TTEntry& LookUpChildEntry(const Position& n, const Move move, const uint16_t depth) {
 		Cluster* entries;
 		uint32_t hash_high;
 		Hand hand;
@@ -291,6 +291,7 @@ struct TranspositionTable {
 
 	void NewSearch() {
 		++generation;
+		if (generation == 0) generation = 1;
 	}
 
 	void* tt_raw = nullptr;
@@ -301,7 +302,7 @@ struct TranspositionTable {
 };
 
 static const constexpr int kInfinitePnDn = 100000000;
-static const constexpr int kMaxDepth = 256;
+static const constexpr uint16_t kMaxDepth = 256;
 
 TranspositionTable transposition_table;
 
@@ -709,7 +710,7 @@ FORCE_INLINE u32 dp(const Hand& us, const Hand& them) {
 }
 
 template <bool or_node>
-void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, int64_t& searchedNode) {
+void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, uint16_t depth, int64_t& searchedNode) {
 	auto& entry = transposition_table.LookUp<or_node>(n, depth);
 
 	if (depth > kMaxDepth) {
