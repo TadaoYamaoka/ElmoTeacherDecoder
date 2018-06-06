@@ -10,6 +10,7 @@ using namespace std;
 const constexpr int64_t HASH_SIZE_MB = 4096;
 const constexpr int64_t MAX_SEARCH_NODE = 2097152;
 const constexpr int REPEAT = INT_MAX;
+const constexpr size_t MaxCheckMoves = 73;
 
 // --- 詰み将棋探索
 
@@ -90,7 +91,7 @@ public:
 					++curr;
 			}
 		}
-		assert(size() <= 73);
+		assert(size() <= MaxCheckMoves);
 	}
 	size_t size() const { return static_cast<size_t>(last_ - moveList_); }
 	ExtMove* begin() { return &moveList_[0]; }
@@ -98,7 +99,7 @@ public:
 	bool empty() const { return size() == 0; }
 
 private:
-	ExtMove moveList_[73];
+	ExtMove moveList_[MaxCheckMoves];
 	ExtMove* last_;
 };
 
@@ -107,7 +108,6 @@ private:
 // 詰め将棋専用の置換表を用いている
 // ただしSmallTreeGCは実装せず、Stockfishの置換表の実装を真似ている
 struct TranspositionTable {
-	static const constexpr uint32_t kInfiniteDepth = 1000000;
 	struct TTEntry {
 		// ハッシュの上位32ビット
 		uint32_t hash_high; // 0
@@ -227,11 +227,10 @@ struct TranspositionTable {
 		return LookUp(n.getBoardKey(), or_node ? n.hand(n.turn()) : n.hand(oppositeColor(n.turn())), depth);
 	}
 
-	// moveを指した後の子ノードの置換表エントリを返す
+	// moveを指した後の子ノードのキーを返す
 	template <bool or_node>
-	TTEntry& LookUpChildEntry(const Position& n, const Move move, const int depth) {
+	void GetChildEntryKey(const Position& n, const Move move, Key& key, Hand& hand) {
 		// 手駒は常に先手の手駒で表す
-		Hand hand;
 		if (or_node) {
 			hand = n.hand(n.turn());
 			if (move.isDrop()) {
@@ -248,7 +247,16 @@ struct TranspositionTable {
 		else {
 			hand = n.hand(oppositeColor(n.turn()));
 		}
-		return LookUp(n.getBoardKeyAfter(move), hand, depth + 1);
+		key = n.getBoardKeyAfter(move);
+	}
+
+	// moveを指した後の子ノードの置換表エントリを返す
+	template <bool or_node>
+	TTEntry& LookUpChildEntry(const Position& n, const Move move, const int depth) {
+		Key key;
+		Hand hand;
+		GetChildEntryKey<or_node>(n, move, key, hand);
+		return LookUp<or_node>(key, hand, depth + 1);
 	}
 
 	void Resize() {
@@ -961,6 +969,17 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, 
 	// TODO(nodchip): このタイミングでminimum distanceを保存するのが正しいか確かめる
 	//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 
+	// 子局面のハッシュキーをキャッシュ
+	struct TTKey {
+		Key key;
+		Hand hand;
+	} ttkeys[MaxCheckMoves];
+
+	for (const auto& move : move_picker) {
+		auto& ttkey = ttkeys[&move - move_picker.begin()];
+		transposition_table.GetChildEntryKey<or_node>(n, move, ttkey.key, ttkey.hand);
+	}
+
 	while (searchedNode < MAX_SEARCH_NODE) {
 		++entry.num_searched;
 
@@ -988,7 +1007,8 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, 
 			u32 rook = UINT_MAX;
 			bool first = true;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry<or_node>(n, move, depth);
+				auto& ttkey = ttkeys[&move - move_picker.begin()];
+				const auto& child_entry = transposition_table.LookUp(ttkey.key, ttkey.hand, depth + 1);
 				if (child_entry.pn == 0) {
 					// 詰みの場合
 					//cout << n.toSFEN() << " or" << endl;
@@ -1099,7 +1119,8 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, 
 			u32 rook = 0;
 			bool all_mate = true;
 			for (const auto& move : move_picker) {
-				const auto& child_entry = transposition_table.LookUpChildEntry<or_node>(n, move, depth);
+				auto& ttkey = ttkeys[&move - move_picker.begin()];
+				const auto& child_entry = transposition_table.LookUp(ttkey.key, ttkey.hand, depth + 1);
 				if (all_mate) {
 					if (child_entry.pn == 0) {
 						const Hand& child_pp = child_entry.hand;
