@@ -290,7 +290,7 @@ static const constexpr int kMaxDepth = 256;
 
 TranspositionTable transposition_table;
 
-bool nomate(const Position& pos) {
+FORCE_INLINE bool nomate(const Position& pos) {
 	// --- 駒の移動による王手
 
 	// 王手になる指し手
@@ -586,8 +586,6 @@ bool nomate(const Position& pos) {
 		}
 	}
 
-	const Bitboard pinned = pos.pinnedBB();
-
 	// --- 駒打ちによる王手
 
 	const Bitboard dropTarget = pos.nOccupiedBB(); // emptyBB() ではないので注意して使うこと。
@@ -664,7 +662,7 @@ bool nomate(const Position& pos) {
 }
 
 // 王手の指し手が近接王手か
-bool moveGivesNeighborCheck(const Position pos, const Move move)
+FORCE_INLINE bool moveGivesNeighborCheck(const Position pos, const Move move)
 {
 	const Color them = oppositeColor(pos.turn());
 	const Square ksq = pos.kingSquare(them);
@@ -683,7 +681,7 @@ bool moveGivesNeighborCheck(const Position pos, const Move move)
 }
 
 // 反証駒を計算(持っている持ち駒を最大数にする(後手の持ち駒を加える))
-u32 dp(const Hand& us, const Hand& them) {
+FORCE_INLINE u32 dp(const Hand& us, const Hand& them) {
 	u32 dp = 0;
 	u32 pawn = us.exists<HPawn>(); if (pawn > 0) dp += pawn + them.exists<HPawn>();
 	u32 lance = us.exists<HLance>(); if (lance > 0) dp += lance + them.exists<HLance>();
