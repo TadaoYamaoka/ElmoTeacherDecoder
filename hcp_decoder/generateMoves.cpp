@@ -593,13 +593,8 @@ namespace {
 			}
 			(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 			break;
-		case Gold: case ProPawn: case ProLance: case ProKnight: case ProSilver: case Horse: case Dragon:
+		case Gold: case King: case ProPawn: case ProLance: case ProKnight: case ProSilver: case Horse: case Dragon:
 			(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
-			break;
-		case King:
-			// 玉の移動先に相手の駒の利きがあれば、合法手でないので除く
-			if (!pos.attackersToIsAny(oppositeColor(US), to))
-				(*moveList++).move = makeNonPromoteMove<Capture>(pt, from, to, pos);
 			break;
 		default: UNREACHABLE;
 		}
@@ -947,7 +942,7 @@ namespace {
 
 			// pinされている駒の移動による自殺手を削除
 			while (curr != moveList) {
-				if (!pos.pseudoLegalMoveIsLegal<false, true>(curr->move, pinned))
+				if (!pos.pseudoLegalMoveIsLegal<true, false>(curr->move, pinned))
 					curr->move = (--moveList)->move;
 				else
 					++curr;
@@ -1283,7 +1278,7 @@ namespace {
 
 			// pinされている駒の移動による自殺手を削除
 			while (curr != moveList) {
-				if (!pos.pseudoLegalMoveIsLegal<false, true>(curr->move, pinned))
+				if (!pos.pseudoLegalMoveIsLegal<true, false>(curr->move, pinned))
 					curr->move = (--moveList)->move;
 				else
 					++curr;
