@@ -26,7 +26,7 @@ void test1()
 	pos.undoMove(move);*/
 
 	vector<string> sfens = {
-		"1n1g3+Pl/k1p1s4/1ng5p/pSP1p1pp1/1n3p3/P1K3P1P/1P7/9/L1G5L b 2R2BG2SL5Pn 161", // mate 15
+		/*"1n1g3+Pl/k1p1s4/1ng5p/pSP1p1pp1/1n3p3/P1K3P1P/1P7/9/L1G5L b 2R2BG2SL5Pn 161", // mate 15
 		"ln6K/9/1sp2+P3/pp4G1p/6P2/+rl+B+R5/k8/+b8/9 b 2G2SNL2Pgs2nl10p 1", // mate 15
 		"ln1s+R3K/2s6/p1pp1p3/kp+r4pp/N3p4/1Sg6/P2B2P1P/5g3/LL3g1NL b BGS2Pn5p 1", // mate 17
 		"n1gg2+R2/l2l5/p1k1p3K/1ppp5/3PBp3/9/P4P2P/g8/8L b RG2S2NL6Pb2sn2p 1", // mate 33
@@ -54,7 +54,11 @@ void test1()
 		"knS5K/llGp3G1/pp2+R2S1/2n6/9/6S2/P3+n3P/2P2P2L/6GNb b RBGSL11P 1", // mate 5
 		"ln5+LK/1rk1+B2S1/p1sp5/4p1pp1/1PPP1P3/2S1P3+l/P1B2S3/1R2G2+p1/LN3G3 b 2GN5Pnp", // mate 13
 		"1p+Bnn+R2K/3+R5/4ps1pp/3p2p2/1NG1s4/6kPP/P2PP4/3G1+s1G1/L8 b BSN3L6Pgp 1", // mate 11
-		"lns3kn1/1r7/4pgs+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l b BG3Pl3p 49", // ïsãlÇ›
+		"l2g2p1+P/1k2n4/ppns5/2pb2g1+L/4PP1pK/PP5S1/3+b1+s2P/7P1/8+r w 4Pr2gs2n2l2p 1", // mate 11*/
+		"ln2k2+L1/2gs1g3/2pppPs1p/1P7/5+B1P1/p1PPS4/P3P1P1P/1+r2g1GR1/1+b4KNL w 2NL2Ps2p 1", // mate 7
+		"6sn1/5gk1l/1P1s1pppb/2pn4p/2gS+B1PP1/1p7/1+RP2P2P/1K1+p5/1N1r4L w 2GSN2L5P 16", // mate 7
+		"l5s1l/1g4gk1/p3ppppp/9/7N1/1+RPp4P/P3+bPP1K/9/3G1SsNL w RNL4Pbgsn2p 18", // mate 7
+		/*"lns3kn1/1r7/4pgs+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l b BG3Pl3p 49", // ïsãlÇ›
 		"lns4n1/1r3k3/4pgsg1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG2R1/LN1K3N+l b B3Pl3p 47", // ïsãlÇ›
 		"7nl/5Psk1/1+P1+P1p1pp/K3g4/6p1B/1SP4P1/PsS3P1P/1N7/+r6NL w GLrb2gnl6p 1", // ïsãlÇ›
 		"ln3+P1+PK/1rk4+B1/3p1+L1+S1/p1p2p1+B1/3+r3s1/7s1/4p1+n+pp/+p3+n2p+p/1+p3+p+p+p+p b 2GN2L2gsp 1", // ïsãlÇ›
@@ -63,6 +67,7 @@ void test1()
 		"l6GK/2p2+R1P1/p1nsp2+Sp/1p1p2s2/2+R2bk2/3P4P/P4+p1g1/2s6/L7L b B2GNL2n7p 1", // ïsãlÇ›
 		"1n3G1nK/2+r2P3/p3+P1n1p/2p2Gp2/5l3/3P5/P1P3S2/6+Bpg/L1S1L3k b R2SNL5Pbg3p 1", // ïsãlÇ›
 		"+B2B1n2K/7+R1/p2p1p1ps/3g2+r1k/1p3n3/4n1P+s1/PP7/1S7/L8 b 3GSL7Pn2l3p 1", // ïsãlÇ›
+		"ln2g3l/2+Rskg3/p2sppL2/2pp1sP1p/2P2n3/B2P1N1p1/P1NKPP2P/1G1S1+p1P1/7+rL b B2Pg 98", // ïsãlÇ›*/
 	};
 
 	for (string sfen : sfens) {
@@ -72,12 +77,12 @@ void test1()
 		//bool ret = mateMoveInOddPly(pos, 11);
 		auto end = std::chrono::system_clock::now();
 
-		auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		auto time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
 		extern int64_t searchedNode;
 		cout << searchedNode << "\t";
 		cout << ret << "\t";
-		cout << time_ms << endl;
+		cout << time_ns / 1000000.0 << endl;
 	}
 }
 
@@ -86,27 +91,33 @@ void test2()
 	Position pos;
 
 	// é©ã ÇÃãlÇ›
-	//pos.set("lns3kn1/1r3gP2/3Bp1s+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l w G2Pl3p 52", nullptr); // mate 2
-	//pos.set("l2Rp1k1l/6g2/2n+R1p1p1/p5P2/2+bpPP3/6G1K/PPPPsS1P1/9/LN2b3L b GS2NPgs4p 1", nullptr); // mate 10
-	//pos.set("ln6K/1ksPg1s+bG/5s2p/ppp3p2/9/P1P3P2/4+p3P/1+r7/LN3L2L b RSb2g2n7p 1", nullptr); // mate 20
-	//pos.set("l+R3g3/3+P1g2k/2+Bppp1+Bn/p1s2sspK/9/P1P+RS1pPg/3P2+n2/2+n2P+n2/L6L1 w GL5Pp 1", nullptr); // ïsãlÇ›Åiå„éËmate 1Åj
-	//pos.set("l3B3k/1r7/p1n2s1G1/1p1n5/7pK/P1P2pSgr/9/6G2/L2+s5 b GSNLbnl12p 1", nullptr); // mate 10
-	pos.set("l6S+P/3k5/p2p3pp/1SN1p2sn/1p7/2nBG1P1K/PP1PP3P/6l+r1/+b2G4L w RG4Pgsnlp 1", nullptr); // mate 8
-	//pos.set("l1g4+RK/1k+P3p1p/1p1s3g1/p2pp1+B2/1N7/P2sP1g1P/1P7/2+r1s4/1N6L w BGS2N2L4P3p 1", nullptr); // mate 16
-	//pos.set("2+R5l/6gk1/2s1p2+Pn/2pp1pP1K/6n2/1P1P4P/4Ps3/4R4/8L w 2B2G2S2N8Pg2l 1", nullptr); // ïsãlÇ›
-	//pos.set("lns1S2nl/1r3kg2/4pgsp1/2pp1p2P/pp2P1b2/2P2P1P1/PPSP5/2GBG2R1/LN1K3NL w 2Pp 1", nullptr); // ïsãlÇ›
+	vector<string> sfens = {
+		//"lns3kn1/1r3gP2/3Bp1s+R1/2pp1p3/pp2P4/2P1SP3/PPSP5/2GBG4/LN1K3N+l w G2Pl3p 52", // mate 2
+		//"l2Rp1k1l/6g2/2n+R1p1p1/p5P2/2+bpPP3/6G1K/PPPPsS1P1/9/LN2b3L b GS2NPgs4p 1", // mate 10
+		//"ln6K/1ksPg1s+bG/5s2p/ppp3p2/9/P1P3P2/4+p3P/1+r7/LN3L2L b RSb2g2n7p 1", // mate 20
+		//"l+R3g3/3+P1g2k/2+Bppp1+Bn/p1s2sspK/9/P1P+RS1pPg/3P2+n2/2+n2P+n2/L6L1 w GL5Pp 1", // ïsãlÇ›Åiå„éËmate 1Åj
+		//"l3B3k/1r7/p1n2s1G1/1p1n5/7pK/P1P2pSgr/9/6G2/L2+s5 b GSNLbnl12p 1", // mate 10
+		"l6S+P/3k5/p2p3pp/1SN1p2sn/1p7/2nBG1P1K/PP1PP3P/6l+r1/+b2G4L w RG4Pgsnlp 1", // mate 8
+		//"l1g4+RK/1k+P3p1p/1p1s3g1/p2pp1+B2/1N7/P2sP1g1P/1P7/2+r1s4/1N6L w BGS2N2L4P3p 1", // mate 16
+		"ln2k2+L1/2gs1g3/2pppPs1p/1P7/5+B1P1/p1PPS4/P3P1P1P/4g1GR1/1+b+r3KNL b 2NL2Ps2p 2", // mate 6
+		//"2+R5l/6gk1/2s1p2+Pn/2pp1pP1K/6n2/1P1P4P/4Ps3/4R4/8L w 2B2G2S2N8Pg2l 1", // ïsãlÇ›
+		//"lns1S2nl/1r3kg2/4pgsp1/2pp1p2P/pp2P1b2/2P2P1P1/PPSP5/2GBG2R1/LN1K3NL w 2Pp 1", // ïsãlÇ›
+	};
 
-	auto start = std::chrono::system_clock::now();
-	bool ret = dfpn_andnode(pos);
-	//bool ret = mateMoveInEvenPly(pos, 8);
-	auto end = std::chrono::system_clock::now();
+	for (string sfen : sfens) {
+		pos.set(sfen, nullptr);
+		auto start = std::chrono::system_clock::now();
+		bool ret = dfpn_andnode(pos);
+		//bool ret = mateMoveInEvenPly(pos, 8);
+		auto end = std::chrono::system_clock::now();
 
-	auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-	extern int64_t searchedNode;
-	cout << searchedNode << endl;
-	cout << ret << endl;
-	cout << time_ms << "ms" << endl;
+		extern int64_t searchedNode;
+		cout << searchedNode << "\t";
+		cout << ret << "\t";
+		cout << time_ms << endl;
+	}
 }
 
 void test3()
@@ -133,10 +144,7 @@ int main(int argc, char *argv[])
 	HuffmanCodedPos::init();
 	dfpn_init();
 
-	//test1();
-	//test2();
-	//test3();
-	//return 0;
+	test1(); return 0;
 
 	if (argc < 3) {
 		std::cout << "extract_mated_hcp input_hcp not_mated_hcp mated_hcp" << std::endl;

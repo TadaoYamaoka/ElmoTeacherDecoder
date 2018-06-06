@@ -298,7 +298,7 @@ struct TranspositionTable {
 	Cluster* tt = nullptr;
 	int64_t num_clusters = 0;
 	int64_t clusters_mask = 0;
-	uint32_t generation = 0;
+	uint16_t generation = 0;
 };
 
 static const constexpr int kInfinitePnDn = 100000000;
