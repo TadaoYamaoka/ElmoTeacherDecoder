@@ -721,6 +721,29 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, uint16_t de
 	}
 
 	// if (n is a terminal node) { handle n and return; }
+	MovePicker<or_node> move_picker(n);
+	if (move_picker.empty()) {
+		// nが先端ノード
+
+		if (or_node) {
+			// 自分の手番でここに到達した場合は王手の手が無かった、
+			entry.pn = kInfinitePnDn;
+			entry.dn = 0;
+
+			// 反証駒
+			// 持っている持ち駒を最大数にする(後手の持ち駒を加える)
+			entry.hand.set(dp(n.hand(n.turn()), n.hand(oppositeColor(n.turn()))));
+		}
+		else {
+			// 相手の手番でここに到達した場合は王手回避の手が無かった、
+			// 1手詰めを行っているため、ここに到達することはない
+			entry.pn = 0;
+			entry.dn = kInfinitePnDn;
+		}
+
+		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
+		return;
+	}
 
 	if (entry.num_searched == 0) {
 		if (or_node) {
@@ -816,7 +839,6 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, uint16_t de
 		}
 		else {
 			// 2手読みチェック
-			MovePicker<false> move_picker(n);
 			StateInfo si2;
 			// この局面ですべてのevasionを試す
 			const CheckInfo ci2(n);
@@ -898,30 +920,6 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, uint16_t de
 
 		NO_MATE:;
 		}
-	}
-
-	MovePicker<or_node> move_picker(n);
-	if (move_picker.empty()) {
-		// nが先端ノード
-
-		if (or_node) {
-			// 自分の手番でここに到達した場合は王手の手が無かった、
-			entry.pn = kInfinitePnDn;
-			entry.dn = 0;
-
-			// 反証駒
-			// 持っている持ち駒を最大数にする(後手の持ち駒を加える)
-			entry.hand.set(dp(n.hand(n.turn()), n.hand(oppositeColor(n.turn()))));
-		}
-		else {
-			// 相手の手番でここに到達した場合は王手回避の手が無かった、
-			// 1手詰めを行っているため、ここに到達することはない
-			entry.pn = 0;
-			entry.dn = kInfinitePnDn;
-		}
-
-		//entry.minimum_distance = std::min(entry.minimum_distance, depth);
-		return;
 	}
 
 	// 千日手のチェック
