@@ -138,6 +138,10 @@ struct TranspositionTable {
 	TTEntry& LookUp(const Key key, const Hand hand, const int depth) {
 		auto& entries = tt[key & clusters_mask];
 		uint32_t hash_high = key >> 32;
+		return LookUpDirect(entries, hash_high, hand, depth);
+	}
+
+	TTEntry& LookUpDirect(Cluster& entries, const uint32_t hash_high, const Hand hand, const int depth) {
 		int max_pn = 1;
 		int max_dn = 1;
 		// 検索条件に合致するエントリを返す
@@ -229,7 +233,7 @@ struct TranspositionTable {
 
 	// moveを指した後の子ノードのキーを返す
 	template <bool or_node>
-	void GetChildEntryKey(const Position& n, const Move move, Key& key, Hand& hand) {
+	void GetChildFirstEntry(const Position& n, const Move move, Cluster*& entries, uint32_t& hash_high, Hand& hand) {
 		// 手駒は常に先手の手駒で表す
 		if (or_node) {
 			hand = n.hand(n.turn());
@@ -247,16 +251,19 @@ struct TranspositionTable {
 		else {
 			hand = n.hand(oppositeColor(n.turn()));
 		}
-		key = n.getBoardKeyAfter(move);
+		Key key = n.getBoardKeyAfter(move);
+		entries = &tt[key & clusters_mask];
+		hash_high = key >> 32;
 	}
 
 	// moveを指した後の子ノードの置換表エントリを返す
 	template <bool or_node>
 	TTEntry& LookUpChildEntry(const Position& n, const Move move, const int depth) {
-		Key key;
+		Cluster* entries;
+		uint32_t hash_high;
 		Hand hand;
-		GetChildEntryKey<or_node>(n, move, key, hand);
-		return LookUp<or_node>(key, hand, depth + 1);
+		GetChildFirstEntry<or_node>(n, move, entries, hash_high, hand);
+		return LookUpDirect<or_node>(*entries, hash_high, hand, depth + 1);
 	}
 
 	void Resize() {
@@ -969,15 +976,16 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, 
 	// TODO(nodchip): このタイミングでminimum distanceを保存するのが正しいか確かめる
 	//entry.minimum_distance = std::min(entry.minimum_distance, depth);
 
-	// 子局面のハッシュキーをキャッシュ
+	// 子局面のハッシュエントリをキャッシュ
 	struct TTKey {
-		Key key;
+		TranspositionTable::Cluster* entries;
+		uint32_t hash_high;
 		Hand hand;
 	} ttkeys[MaxCheckMoves];
 
 	for (const auto& move : move_picker) {
 		auto& ttkey = ttkeys[&move - move_picker.begin()];
-		transposition_table.GetChildEntryKey<or_node>(n, move, ttkey.key, ttkey.hand);
+		transposition_table.GetChildFirstEntry<or_node>(n, move, ttkey.entries, ttkey.hash_high, ttkey.hand);
 	}
 
 	while (searchedNode < MAX_SEARCH_NODE) {
@@ -1008,7 +1016,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, 
 			bool first = true;
 			for (const auto& move : move_picker) {
 				auto& ttkey = ttkeys[&move - move_picker.begin()];
-				const auto& child_entry = transposition_table.LookUp(ttkey.key, ttkey.hand, depth + 1);
+				const auto& child_entry = transposition_table.LookUpDirect(*ttkey.entries, ttkey.hash_high, ttkey.hand, depth + 1);
 				if (child_entry.pn == 0) {
 					// 詰みの場合
 					//cout << n.toSFEN() << " or" << endl;
@@ -1120,7 +1128,7 @@ void DFPNwithTCA(Position& n, int thpn, int thdn/*, bool inc_flag*/, int depth, 
 			bool all_mate = true;
 			for (const auto& move : move_picker) {
 				auto& ttkey = ttkeys[&move - move_picker.begin()];
-				const auto& child_entry = transposition_table.LookUp(ttkey.key, ttkey.hand, depth + 1);
+				const auto& child_entry = transposition_table.LookUpDirect(*ttkey.entries, ttkey.hash_high, ttkey.hand, depth + 1);
 				if (all_mate) {
 					if (child_entry.pn == 0) {
 						const Hand& child_pp = child_entry.hand;
