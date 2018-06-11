@@ -5,14 +5,15 @@
 
 int main(int argc, char *argv[])
 {
-	if (argc < 3) {
-		std::cout << "psv_to_hcp psvFile hcpFile evalThreshold" << std::endl;
+	if (argc < 4) {
+		std::cout << "psv_to_hcp psvFile hcpFile evalThreshold maxPly" << std::endl;
 		return 0;
 	}
 
 	char* psvFile = argv[1];
 	char* hcpFile = argv[2];
 	int evalThreshold = std::stoi(argv[3]);
+	int maxPly = std::stoi(argv[4]);
 
 	std::ifstream ifs(psvFile, std::ifstream::in | std::ifstream::binary | std::ios::ate);
 	if (!ifs) {
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 			d = 0;
 		}
 		PackedSfenValue& psv = inpsvvec[d];
-		if (std::abs(psv.score) < evalThreshold) {
+		if (std::abs(psv.score) < evalThreshold || psv.gamePly <= maxPly) {
 			pos.set(psv.sfen, nullptr);
 			ofs.write(reinterpret_cast<char*>(&pos.toHuffmanCodedPos()), sizeof(HuffmanCodedPos));
 			outNum++;
