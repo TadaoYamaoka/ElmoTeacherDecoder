@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('csa_dir')
 parser.add_argument('hcp_file')
 parser.add_argument('--turn', default=150, type=int)
-parser.add_argument('--eval', default=1000, type=int)
+parser.add_argument('--eval', type=int)
 parser.add_argument('--rate', type=int)
 args = parser.parse_args()
 
@@ -35,7 +35,7 @@ for file in fild_all_files(args.csa_dir):
     rate = {}
     s = ""
     turn = 0
-    turnEval = args.turn
+    turnEval = 0
     try:
         for line in open(file, 'r'):
             if turn == 0:
@@ -43,7 +43,7 @@ for file in fild_all_files(args.csa_dir):
                 if m:
                     rate[m.group(1)] = float(m.group(2))
 
-            if turnEval == args.turn:
+            if args.eval is not None and turnEval == 0:
                 m = ptn_move.search(line)
                 if m:
                     turn += 1
@@ -72,7 +72,7 @@ for file in fild_all_files(args.csa_dir):
     file_num += 1
     board = shogi.Board(kif['sfen'])
     for move in kif['moves']:
-        if board.move_number > args.turn or board.move_number >= turnEval:
+        if board.move_number > args.turn or (args.eval is not None and board.move_number >= turnEval):
             break
         board.push_usi(move)
 
