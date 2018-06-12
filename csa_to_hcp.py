@@ -28,6 +28,7 @@ file_num = 0
 cnt = 0
 
 ptn_rate = re.compile(r"^'(black|white)_rate:.*:(.*)")
+ptn_move = re.compile(r"^[+-]\d")
 ptn_eval = re.compile(r"^'\*\* (-?\d+)")
 
 for file in fild_all_files(args.csa_dir):
@@ -43,11 +44,14 @@ for file in fild_all_files(args.csa_dir):
                     rate[m.group(1)] = float(m.group(2))
 
             if turnEval == args.turn:
-                m = ptn_eval.search(line)
+                m = ptn_move.search(line)
                 if m:
-                    if abs(int(m.group(1))) > args.eval:
-                        turnEval = turn
                     turn += 1
+                else:
+                    m = ptn_eval.search(line)
+                    if m:
+                        if abs(int(m.group(1))) > args.eval:
+                            turnEval = turn
             s += line
     except:
         print(file)
@@ -68,7 +72,7 @@ for file in fild_all_files(args.csa_dir):
     file_num += 1
     board = shogi.Board(kif['sfen'])
     for move in kif['moves']:
-        if board.move_number > args.turn or board.move_number > turnEval:
+        if board.move_number > args.turn or board.move_number >= turnEval:
             break
         board.push_usi(move)
 
