@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>99ec7e4b-bd8a-4f07-bd6c-8a6fdae17406</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>print_sfen_from_psv.py</StartupFile>
+    <StartupFile>csa_to_hcpe.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -13,8 +13,8 @@
     <Name>ElmoTeacherDecoder</Name>
     <RootNamespace>ElmoTeacherDecoder</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>H:\src\YaneuraOu\source\test.psv</CommandLineArguments>
-    <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
+    <CommandLineArguments>r:\test r:\hcpe</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,6 +25,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="csa_to_hcpe.py" />
     <Compile Include="csa_to_hcp.py">
       <SubType>Code</SubType>
     </Compile>

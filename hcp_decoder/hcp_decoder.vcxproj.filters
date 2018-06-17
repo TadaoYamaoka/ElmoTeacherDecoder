@@ -46,7 +46,7 @@
       <Filter>ソース ファイル\elmo_for_learn</Filter>
     </ClCompile>
     <ClCompile Include="generateMoves.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\elmo_for_learn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +90,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="init.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="generateMoves.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

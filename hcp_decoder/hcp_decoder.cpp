@@ -7,6 +7,7 @@
 #include "init.hpp"
 #include "position.hpp"
 #include "move.hpp"
+#include "generateMoves.hpp"
 
 namespace p = boost::python;
 namespace np = boost::python::numpy;
@@ -412,6 +413,65 @@ void sfen_to_hcp(const char* sfen, np::ndarray ndhcp) {
 	*hcp = position.toHuffmanCodedPos();
 }
 
+Move usiToMoveBody(const Position& pos, const std::string& moveStr) {
+	Move move;
+	if (g_charToPieceUSI.isLegalChar(moveStr[0])) {
+		// drop
+		const PieceType ptTo = pieceToPieceType(g_charToPieceUSI.value(moveStr[0]));
+		if (moveStr[1] != '*')
+			return Move::moveNone();
+		const File toFile = charUSIToFile(moveStr[2]);
+		const Rank toRank = charUSIToRank(moveStr[3]);
+		if (!isInSquare(toFile, toRank))
+			return Move::moveNone();
+		const Square to = makeSquare(toFile, toRank);
+		move = makeDropMove(ptTo, to);
+	}
+	else {
+		const File fromFile = charUSIToFile(moveStr[0]);
+		const Rank fromRank = charUSIToRank(moveStr[1]);
+		if (!isInSquare(fromFile, fromRank))
+			return Move::moveNone();
+		const Square from = makeSquare(fromFile, fromRank);
+		const File toFile = charUSIToFile(moveStr[2]);
+		const Rank toRank = charUSIToRank(moveStr[3]);
+		if (!isInSquare(toFile, toRank))
+			return Move::moveNone();
+		const Square to = makeSquare(toFile, toRank);
+		if (moveStr[4] == '\0')
+			move = makeNonPromoteMove<Capture>(pieceToPieceType(pos.piece(from)), from, to, pos);
+		else if (moveStr[4] == '+') {
+			if (moveStr[5] != '\0')
+				return Move::moveNone();
+			move = makePromoteMove<Capture>(pieceToPieceType(pos.piece(from)), from, to, pos);
+		}
+		else
+			return Move::moveNone();
+	}
+
+	if (pos.moveIsPseudoLegal<false>(move)
+		&& pos.pseudoLegalMoveIsLegal<false, false>(move, pos.pinnedBB()))
+	{
+		return move;
+	}
+	return Move::moveNone();
+}
+
+Move usiToMove(const Position& pos, const std::string& moveStr) {
+	const Move move = usiToMoveBody(pos, moveStr);
+	return move;
+}
+
+void sfen_to_hcpe(const char* sfen, const int eval, const char* bestMove, const char* win, np::ndarray ndhcpe) {
+	HuffmanCodedPosAndEval *hcpe = reinterpret_cast<HuffmanCodedPosAndEval *>(ndhcpe.get_data());
+	Position position;
+	position.set(sfen, nullptr);
+	hcpe->hcp = position.toHuffmanCodedPos();
+	hcpe->eval = eval;
+	hcpe->bestMove16 = static_cast<u16>(usiToMove(position, bestMove).value());
+	hcpe->gameResult = (strcmp(win, "b") == 0) ? BlackWin : WhiteWin;
+}
+
 BOOST_PYTHON_MODULE(hcp_decoder) {
 	Py_Initialize();
 	np::initialize();
@@ -428,4 +488,5 @@ BOOST_PYTHON_MODULE(hcp_decoder) {
 	p::def("print_sfen_from_hcphe", print_sfen_from_hcphe);
 	p::def("check_duplicates", check_duplicates);
 	p::def("sfen_to_hcp", sfen_to_hcp);
+	p::def("sfen_to_hcpe", sfen_to_hcpe);
 }
