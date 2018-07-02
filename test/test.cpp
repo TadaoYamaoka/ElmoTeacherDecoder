@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#if 0
+#if 1
 // 王手生成テスト
 int main() {
 	initTable();
@@ -20,7 +20,8 @@ int main() {
 	//pos.set("9/R1S1k1S1R/2+P3G2/2G3G2/9/B1NL1LN1B/9/4K4/4L4 b G2S2NL17P 1", nullptr); // 最大数 65
 	//pos.set("5S1S1/RS5k1/5G3/9/5NL1L/9/9/1K7/B8 b RB3GS3N2L18P 1", nullptr); // 最大数 67
 	//pos.set("B7B/1R7/6R2/9/4k4/9/9/9/K1N6 b 4G4S3N4L18P 1", nullptr); // 最大数 83 成り含む
-	pos.set("4S4/R1S3k1S/4+P3+P/9/8N/4N3N/1L7/B8/5L1LK b RB4GSNL16P 1", nullptr); // 最大数 74(73香の2段目不成を除く)
+	//pos.set("4S4/R1S3k1S/4+P3+P/9/8N/4N3N/1L7/B8/5L1LK b RB4GSNL16P 1", nullptr); // 最大数 74(73香の2段目不成を除く)
+	pos.set("lnsgkgsnl/1r5b1/ppppNp1pp/6pN1/4R3B/9/PPPPPPPPP/9/L1SGKGS1L b p 1", nullptr); // 1，2段目に移動する桂馬で開き王手
 
 	// 王手生成
 	int cnt = 0;
@@ -47,7 +48,7 @@ int main() {
 }
 #endif
 
-#if 1
+#if 0
 // 近接王手生成テスト
 int main() {
 	initTable();
