@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.539
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ElmoTeacherDecoder", "ElmoTeacherDecoder.pyproj", "{99EC7E4B-BD8A-4F07-BD6C-8A6FDAE17406}"
 EndProject
@@ -168,5 +168,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C8C802AF-B771-4EA0-98E4-CA4CD3BF6880}
 	EndGlobalSection
 EndGlobal
