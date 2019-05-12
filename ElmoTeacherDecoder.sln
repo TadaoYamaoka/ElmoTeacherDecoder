@@ -29,6 +29,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "extract_mated_hcp", "extrac
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{B9524F81-A27A-48D5-A2F8-AF3F011D1D69}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "delete_hcp", "delete_hcp\delete_hcp.vcxproj", "{840452E4-511E-4F77-8D08-FF7206E5FE48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,16 @@ Global
 		{B9524F81-A27A-48D5-A2F8-AF3F011D1D69}.Release|x64.Build.0 = Release|x64
 		{B9524F81-A27A-48D5-A2F8-AF3F011D1D69}.Release|x86.ActiveCfg = Release|Win32
 		{B9524F81-A27A-48D5-A2F8-AF3F011D1D69}.Release|x86.Build.0 = Release|Win32
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Debug|x64.ActiveCfg = Debug|x64
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Debug|x64.Build.0 = Debug|x64
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Debug|x86.ActiveCfg = Debug|Win32
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Debug|x86.Build.0 = Debug|Win32
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Release|Any CPU.ActiveCfg = Release|Win32
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Release|x64.ActiveCfg = Release|x64
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Release|x64.Build.0 = Release|x64
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Release|x86.ActiveCfg = Release|Win32
+		{840452E4-511E-4F77-8D08-FF7206E5FE48}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
