@@ -26,7 +26,10 @@ bool operator ==(const HuffmanCodedPosAndEval& l, const HuffmanCodedPosAndEval& 
 
 int main(int argc, char** argv)
 {
-	if (argc < 4) return 1;
+	if (argc < 4) {
+		std::cout << "hcpe_uniq2 infile comparefile outfile" << std::endl;
+		return 1;
+	}
 
 	char* infile = argv[1];
 	char* comparefile = argv[2];

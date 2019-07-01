@@ -40,7 +40,10 @@ bool operator ==(const HuffmanCodedPosAndEval& l, const HuffmanCodedPosAndEval& 
 
 int main(int argc, char** argv)
 {
-	if (argc < 3) return 1;
+	if (argc < 3) {
+		std::cout << "hcpe_uniq infile outfile" << std::endl;
+		return 1;
+	}
 
 	char* infile = argv[1];
 	char* outfile = argv[2];
