@@ -1937,7 +1937,6 @@ HuffmanCodedPos Position::toHuffmanCodedPos() const {
     return result;
 }
 
-#if !defined NDEBUG
 bool Position::isOK() const {
     static Key prevKey;
     const bool debugAll = true;
@@ -2058,14 +2057,11 @@ incorrect_position:
     print();
     return false;
 }
-#endif
 
-#if !defined NDEBUG
 int Position::debugSetEvalList() const {
     // not implement
     return 0;
 }
-#endif
 
 Key Position::computeBoardKey() const {
     Key result = 0;
