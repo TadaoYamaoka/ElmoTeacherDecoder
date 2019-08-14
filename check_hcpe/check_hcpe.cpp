@@ -24,8 +24,8 @@ HuffmanCodedPosAndEval* read_hcpes(const char* path, s64& entryNum)
 
 int main(int argc, char** argv)
 {
-	if (argc < 1) {
-		std::cout << "check hcpe" << std::endl;
+	if (argc <= 1) {
+		std::cout << "check_hcpe hcpe" << std::endl;
 		return 0;
 	}
 

@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 
 	test4(); return 0;
 
-	if (argc < 3) {
+	if (argc <= 3) {
 		std::cout << "extract_mated_hcp input_hcp not_mated_hcp mated_hcp" << std::endl;
 		return 0;
 	}

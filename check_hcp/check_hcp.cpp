@@ -23,8 +23,8 @@ HuffmanCodedPos* read_hcps(const char* path, s64& entryNum)
 
 int main(int argc, char** argv)
 {
-	if (argc < 1) {
-		std::cout << "check hcp" << std::endl;
+	if (argc <= 1) {
+		std::cout << "check_hcp hcp" << std::endl;
 		return 0;
 	}
 
