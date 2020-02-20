@@ -1,108 +1,74 @@
-import shogi
-import shogi.CSA
 import numpy as np
-import hcp_decoder
-import os
-import re
-import argparse
+from cshogi import *
+import glob
+import os.path
 
-parser = argparse.ArgumentParser()
-parser.add_argument('csa_dir')
-parser.add_argument('hcpe_file')
-parser.add_argument('--turn', default=256, type=int)
-parser.add_argument('--eval', type=int)
-parser.add_argument('--rate', type=int)
-args = parser.parse_args()
+MAX_MOVE_COUNT = 512
 
-HuffmanCodedPosAndEval = np.dtype([
-    ('hcp', np.uint8, 32),
-    ('eval', np.int16),
-    ('bestMove16', np.uint16),
-    ('gameResult', np.uint8),
-    ('dummy', np.uint8),
-    ])
+# process csa
+def process_csa(f, csa_file_list, filter_moves, filter_rating):
+    board = Board()
+    parser = Parser()
+    num_games = 0
+    num_positions = 0
+    hcpes = np.zeros(MAX_MOVE_COUNT, dtype=HuffmanCodedPosAndEval)
+    for filepath in csa_file_list:
+        parser.parse_csa_file(filepath)
+        if parser.endgame not in ('%TORYO', '%SENNICHITE', '%KACHI', '%HIKIWAKE') or len(parser.moves) < filter_moves:
+            continue
+        if filter_rating > 0 and (parser.ratings[0] < filter_rating or parser.ratings[1] < filter_rating):
+            continue
+        board.set_sfen(parser.sfen)
+        assert board.is_ok(), "{}:{}".format(filepath, parser.sfen)
+        # gameResult
+        skip = False
+        for i, (move, score) in enumerate(zip(parser.moves, parser.scores)):
+            if not board.is_legal(move):
+                print("skip {}:{}:{}".format(filepath, i, move_to_usi(move)))
+                skip = True
+                break
 
-def fild_all_files(directory):
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            yield os.path.join(root, file)
+            # hcp
+            board.to_hcp(hcpes[i]['hcp'])
+            # eval
+            hcpes[i]['eval'] = score
+            # move
+            hcpes[i]['bestMove16'] = move16(move)
+            # result
+            hcpes[i]['gameResult'] = parser.win
 
-hcpevec = np.empty(100000000, dtype=HuffmanCodedPosAndEval)
-file_num = 0
-cnt = 0
+            board.push(move)
 
-ptn_rate = re.compile(r"^'(black|white)_rate:.*:(.*)")
-ptn_move = re.compile(r"^[+-]\d")
-ptn_eval = re.compile(r"^'\*\* (-?\d+)")
+        if skip:
+            continue
 
-for file in fild_all_files(args.csa_dir):
-    rate = {}
-    s = ""
-    turn = 0
-    eval = []
-    eval_exist = False
-    noeval = True
-    try:
-        for line in open(file, 'r'):
-            if turn == 0:
-                m = ptn_rate.search(line)
-                if m:
-                    rate[m.group(1)] = float(m.group(2))
+        # write data
+        hcpes[0:i+1].tofile(f)
 
-            m = ptn_move.search(line)
-            if m:
-                if turn > 0 and eval_exist == False:
-                    eval.append(None)
-                turn += 1
-                eval_exist = False
-            else:
-                m = ptn_eval.search(line)
-                if m:
-                    eval.append(int(m.group(1)))
-                    eval_exist = True
-                    noeval = False
-            s += line
-    except:
-        print(file)
-        continue
+        num_positions += i + 1
+        num_games += 1
 
-    if turn > 0 and eval_exist == False:
-        eval.append(None)
+    return num_games, num_positions
 
-    if turn == 0:
-        continue
+if __name__ == '__main__':
+    import argparse
 
-    if noeval:
-        continue
+    parser = argparse.ArgumentParser()
+    parser.add_argument('csa_dir', help='directory stored CSA file')
+    parser.add_argument('hcpe', help='hcpe file')
+    parser.add_argument('--filter_moves', type=int, default=50, help='filter by move count')
+    parser.add_argument('--filter_rating', type=int, default=3000, help='filter by rating')
+    parser.add_argument('--recursive', '-r', action='store_true')
 
-    if args.rate is not None and (len(rate) < 2 or min(rate.values()) < args.rate):
-        continue
+    args = parser.parse_args()
 
-    try:
-        kif = shogi.CSA.Parser.parse_str(s)[0]
-    except:
-        print(file)
-        continue
+    if args.recursive:
+        dir = os.path.join(args.csa_dir, '**')
+    else:
+        dir = args.csa_dir
+    csa_file_list = glob.glob(os.path.join(dir, '*.csa'), recursive=args.recursive)
 
-    if kif['win'] not in ('b', 'w'):
-        continue
-
-    file_num += 1
-    board = shogi.Board(kif['sfen'])
-    for i, move in enumerate(kif['moves']):
-        if board.move_number > args.turn or (args.eval is not None and eval[i] is not None and abs(eval[i]) > args.eval):
-            break
-
-        if eval[i] is not None:
-            if board.turn == shogi.WHITE:
-                eval[i] *= -1
-            hcp_decoder.sfen_to_hcpe(board.sfen(), eval[i], move, kif['win'], hcpevec[cnt:cnt+1])
-            cnt += 1
-
-        board.push_usi(move)
-
-print('file num =', file_num)
-print('position num =', cnt)
-hcpe_uniq = np.unique(hcpevec[:cnt])
-print('uniq position num =', len(hcpe_uniq))
-hcpe_uniq.tofile(args.hcpe_file)
+    with open(args.hcpe, 'wb') as f:
+        num_games, num_positions = process_csa(f, csa_file_list, args.filter_moves, args.filter_rating)
+        print(f"games : {num_games}")
+        print(f"positionss : {num_positions}")
