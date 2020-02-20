@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "check_hcpe", "check_hcpe\ch
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "check_hcp", "check_hcp\check_hcp.vcxproj", "{BF964FAF-F0C5-402B-BE7F-016118DFF8C0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "extract_nyugyoku_hcp_from_hcpe", "extract_nyugyoku_hcp_from_hcpe\extract_nyugyoku_hcp_from_hcpe.vcxproj", "{E196705E-E5C1-408A-9474-E1DB63B07094}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -201,6 +203,16 @@ Global
 		{BF964FAF-F0C5-402B-BE7F-016118DFF8C0}.Release|x64.Build.0 = Release|x64
 		{BF964FAF-F0C5-402B-BE7F-016118DFF8C0}.Release|x86.ActiveCfg = Release|Win32
 		{BF964FAF-F0C5-402B-BE7F-016118DFF8C0}.Release|x86.Build.0 = Release|Win32
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Debug|x64.ActiveCfg = Debug|x64
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Debug|x64.Build.0 = Debug|x64
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Debug|x86.ActiveCfg = Debug|Win32
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Debug|x86.Build.0 = Debug|Win32
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Release|Any CPU.ActiveCfg = Release|Win32
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Release|x64.ActiveCfg = Release|x64
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Release|x64.Build.0 = Release|x64
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Release|x86.ActiveCfg = Release|Win32
+		{E196705E-E5C1-408A-9474-E1DB63B07094}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
