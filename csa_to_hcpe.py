@@ -71,4 +71,4 @@ if __name__ == '__main__':
     with open(args.hcpe, 'wb') as f:
         num_games, num_positions = process_csa(f, csa_file_list, args.filter_moves, args.filter_rating)
         print(f"games : {num_games}")
-        print(f"positionss : {num_positions}")
+        print(f"positions : {num_positions}")
