@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>99ec7e4b-bd8a-4f07-bd6c-8a6fdae17406</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>csa_to_hcpe.py</StartupFile>
+    <StartupFile>yanebook_to_aperybook.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -13,7 +13,7 @@
     <Name>ElmoTeacherDecoder</Name>
     <RootNamespace>ElmoTeacherDecoder</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>r:\test r:\hcpe</CommandLineArguments>
+    <CommandLineArguments>F:\book\100T-shock-book\user_book1.db r:\book.bin</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
   </PropertyGroup>
@@ -52,6 +52,9 @@
     <Compile Include="test2.py" />
     <Compile Include="winrate.py" />
     <Compile Include="test.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="yanebook_to_aperybook.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
