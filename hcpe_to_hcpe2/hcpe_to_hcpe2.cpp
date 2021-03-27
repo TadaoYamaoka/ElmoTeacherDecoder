@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 		pos.set(hcpe[i].hcp, nullptr);
 		auto bb = pos.occupiedBB();
 		const auto diff_cnt = (pre_bb ^ bb).popCount();
-		if (pre_result != hcpe[i].gameResult || diff_cnt > 7) {
+		if (pre_result != hcpe[i].gameResult || diff_cnt > 7 || i + 1 == entryNum) {
 			//std::cout << i << "\t" << diff_cnt << "\t" << i - start_p << "\t" << (int)hcpe[i].gameResult << std::endl;
 
 			bool is_out = false;
@@ -79,13 +79,13 @@ int main(int argc, char* argv[])
 				//	std::cout << pos_copy.toSFEN() << "\t" << hcpe[i - 1].eval << "\t" << (int)hcpe[i - 1].gameResult << "\t" << i - start_p << std::endl;
 				//}
 
-				if (hcpe[i - 1].eval == 0) {
+				//if (hcpe[i - 1].eval == 0) {
 					// ç“úè
 					for (s64 j = start_p; j < i; ++j) {
 						(int8_t&)hcpe[j].gameResult |= 4; // sennichite
 					}
 					is_out = true;
-				}
+				//}
 			}
 			else {
 				is_out = true;
