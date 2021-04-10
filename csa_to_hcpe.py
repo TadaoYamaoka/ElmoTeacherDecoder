@@ -28,6 +28,8 @@ def process_csa(f, csa_file_list, filter_moves, filter_rating):
                 # hcp
                 board.to_hcp(hcpes[i]['hcp'])
                 # eval
+                assert abs(score) <= 100000
+                score = min(32767, max(score, -32767))
                 hcpes[i]['eval'] = score if board.turn == BLACK else -score
                 # move
                 hcpes[i]['bestMove16'] = move16(move)
