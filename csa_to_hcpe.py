@@ -21,25 +21,22 @@ def process_csa(f, csa_file_list, filter_moves, filter_rating):
         board.set_sfen(parser.sfen)
         assert board.is_ok(), "{}:{}".format(filepath, parser.sfen)
         # gameResult
-        skip = False
-        for i, (move, score) in enumerate(zip(parser.moves, parser.scores)):
-            if not board.is_legal(move):
-                print("skip {}:{}:{}".format(filepath, i, move_to_usi(move)))
-                skip = True
-                break
+        try:
+            for i, (move, score) in enumerate(zip(parser.moves, parser.scores)):
+                assert board.is_legal(move)
 
-            # hcp
-            board.to_hcp(hcpes[i]['hcp'])
-            # eval
-            hcpes[i]['eval'] = score
-            # move
-            hcpes[i]['bestMove16'] = move16(move)
-            # result
-            hcpes[i]['gameResult'] = parser.win
+                # hcp
+                board.to_hcp(hcpes[i]['hcp'])
+                # eval
+                hcpes[i]['eval'] = score if board.turn == BLACK else -score
+                # move
+                hcpes[i]['bestMove16'] = move16(move)
+                # result
+                hcpes[i]['gameResult'] = parser.win
 
-            board.push(move)
-
-        if skip:
+                board.push(move)
+        except:
+            print("skip {}:{}:{}:{}".format(filepath, i, move_to_usi(move), score))
             continue
 
         # write data
