@@ -41,8 +41,17 @@ int main(int argc, char** argv)
 	Position pos;
 	for (s64 i = 0; i < srcEntryNum; i++) {
 		pos.set(hcpes[i].hcp, nullptr);
-		Move move = move16toMove(Move(hcpes[i].bestMove16), pos);
 		if (!pos.isOK()) {
+			std::cout << "not ok 1" << std::endl;
+			__debugbreak();
+		}
+		Move move = move16toMove(Move(hcpes[i].bestMove16), pos);
+		if (!pos.moveIsLegal(move)) {
+			std::cout << "illegal" << std::endl;
+			__debugbreak();
+		}
+		if (!pos.isOK()) {
+			std::cout << "not ok 2" << std::endl;
 			__debugbreak();
 		}
 	}
